@@ -111,11 +111,11 @@ namespace Anthrax
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////BLOOD SPEC//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		if (ObjectManager.LocalPlayer.HasAuraById((int)Auras.BloodCheck))
+		if (ME.HasAuraById((int)Auras.BloodCheck))
 		{
             // Bone Shield
-            if ((!ObjectManager.LocalPlayer.HasAuraById((int)Auras.BoneShield) ||
-                ObjectManager.LocalPlayer.Auras.Where(x => x.SpellId == (int)Auras.BoneShield && x.StackCount <= 1).Any()) &&
+            if ((!ME.HasAuraById((int)Auras.BoneShield) ||
+                ME.Auras.Where(x => x.SpellId == (int)Auras.BoneShield && x.StackCount <= 1).Any()) &&
             AI.Controllers.Spell.CanCast((int)Spells.BoneShield))
             {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BoneShield);
@@ -123,7 +123,7 @@ namespace Anthrax
             }
 
             // Horn of Winter
-            if (!ObjectManager.LocalPlayer.HasAuraById((int)Auras.HoW) &&
+            if (!ME.HasAuraById((int)Auras.HoW) &&
             AI.Controllers.Spell.CanCast((int)Spells.HoW))
             {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HoW);
@@ -133,7 +133,7 @@ namespace Anthrax
             // We always want to face the target
             //WoW.Internals.Movements.Face(unit.Position);
 
-            if (ObjectManager.LocalPlayer.HealthPercent < 30)
+            if (ME.HealthPercent < 30)
             {
                 // Death Strike
                 if (AI.Controllers.Spell.CanCast((int)Spells.DeathStrike))
@@ -159,7 +159,7 @@ namespace Anthrax
 
                 // Deseases
 				
-				if (ObjectManager.LocalPlayer.HasAuraById((int)Auras.CS))
+				if (ME.HasAuraById((int)Auras.CS))
 				{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodBoil);
                     return;
@@ -199,7 +199,7 @@ namespace Anthrax
                 }
 
                 // Rune Strike
-                if (ObjectManager.LocalPlayer.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 30 &&
+                if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 30 &&
                     AI.Controllers.Spell.CanCast((int)Spells.RuneStrike))
                 {
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.RuneStrike);
@@ -252,10 +252,10 @@ namespace Anthrax
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////FROST SPEC//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		if (ObjectManager.LocalPlayer.HasAuraById((int)Auras.FrostCheck) && !unit.HasAuraById((int)Auras.DWCheck))
+		if (ME.HasAuraById((int)Auras.FrostCheck) && !unit.HasAuraById((int)Auras.DWCheck))
 		{
             // Horn of Winter
-            if (!ObjectManager.LocalPlayer.HasAuraById((int)Auras.HoW) &&
+            if (!ME.HasAuraById((int)Auras.HoW) &&
             AI.Controllers.Spell.CanCast((int)Spells.HoW))
             {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HoW);
@@ -265,7 +265,7 @@ namespace Anthrax
             // We always want to face the target
             //WoW.Internals.Movements.Face(unit.Position);
 
-            if (ObjectManager.LocalPlayer.HealthPercent < 30)
+            if (ME.HealthPercent < 30)
             {
                 // Death Strike
                 if (AI.Controllers.Spell.CanCast((int)Spells.DeathStrike))
@@ -289,13 +289,13 @@ namespace Anthrax
             if (unit.Position.Distance3DFromPlayer < 7)
             {
 				//Pillar Of Frost
-				if (!ObjectManager.LocalPlayer.HasAuraById((int)Auras.PoF) && AI.Controllers.Spell.CanCast((int)Spells.PoF))
+				if (!ME.HasAuraById((int)Auras.PoF) && AI.Controllers.Spell.CanCast((int)Spells.PoF))
 				{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PoF);
 				}
                 // Deseases
 				
-				if (ObjectManager.LocalPlayer.HasAuraById((int)Auras.Rime))
+				if (ME.HasAuraById((int)Auras.Rime))
 				{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HowlingBlast);
                     return;
@@ -334,7 +334,7 @@ namespace Anthrax
 				}
 
                 // Frost Strike
-                if (ObjectManager.LocalPlayer.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 20 &&
+                if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 20 &&
                     AI.Controllers.Spell.CanCast((int)Spells.FrostStrike))
                 {
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FrostStrike);
@@ -348,7 +348,7 @@ namespace Anthrax
                 return;
             }
 			
-			if (ObjectManager.LocalPlayer.Auras.Where(x => x.SpellId == (int)Auras.BloodTap && x.StackCount >= 5).Any())
+			if (ME.Auras.Where(x => x.SpellId == (int)Auras.BloodTap && x.StackCount >= 5).Any())
 			{
 			//AI.Controllers.Spell.Cast((int)Spells.BloodTap, unit);
 			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodTap);
@@ -377,25 +377,25 @@ namespace Anthrax
 
         }
 		////////////////////////////////DW FROST  Written By schmiddi/////////////////////////////////////////////////////
-		if (ObjectManager.LocalPlayer.HasAuraById((int)Auras.FrostCheck) && unit.HasAuraById((int)Auras.DWCheck))
+		if (ME.HasAuraById((int)Auras.FrostCheck) && unit.HasAuraById((int)Auras.DWCheck))
 		{
 			//Frost Strike if over 89 Runic Power
-			if (ObjectManager.LocalPlayer.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 89 && AI.Controllers.Spell.CanCast((int)Spells.FrostStrike) ||
-			ObjectManager.LocalPlayer.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 20 && AI.Controllers.Spell.CanCast((int)Spells.FrostStrike) && ObjectManager.LocalPlayer.HasAuraById((int)Auras.KillingM))
+			if (ME.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 89 && AI.Controllers.Spell.CanCast((int)Spells.FrostStrike) ||
+			ME.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 20 && AI.Controllers.Spell.CanCast((int)Spells.FrostStrike) && ME.HasAuraById((int)Auras.KillingM))
 				{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FrostStrike);
 				return;
 				}
 			//Pillar Of Frost
-				if (!ObjectManager.LocalPlayer.HasAuraById((int)Auras.PoF) && AI.Controllers.Spell.CanCast((int)Spells.PoF))
+				if (!ME.HasAuraById((int)Auras.PoF) && AI.Controllers.Spell.CanCast((int)Spells.PoF))
 				{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PoF);
 				}
 			
 			//Howling Blast on Cooldown
-			if (AI.Controllers.Spell.CanCast((int)Spells.HowlingBlast) && ObjectManager.LocalPlayer.GetReadyRuneCountByType (WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Frost) > 1 
-			|| AI.Controllers.Spell.CanCast((int)Spells.HowlingBlast) && ObjectManager.LocalPlayer.GetReadyRuneCountByType (WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Death) > 1
-			|| ObjectManager.LocalPlayer.HasAuraById((int)Auras.Rime))
+			if (AI.Controllers.Spell.CanCast((int)Spells.HowlingBlast) && ME.GetReadyRuneCountByType (WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Frost) > 1 
+			|| AI.Controllers.Spell.CanCast((int)Spells.HowlingBlast) && ME.GetReadyRuneCountByType (WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Death) > 1
+			|| ME.HasAuraById((int)Auras.Rime))
 				{
 					WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HowlingBlast);
 					return;
@@ -414,7 +414,7 @@ namespace Anthrax
 				}
 				
 			//Obliterate if you have 1 Unholy Rune
-			if (AI.Controllers.Spell.CanCast((int)Spells.Obliterate) && ObjectManager.LocalPlayer.GetReadyRuneCountByType (WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) >= 1)
+			if (AI.Controllers.Spell.CanCast((int)Spells.Obliterate) && ME.GetReadyRuneCountByType (WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) >= 1)
 				{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Obliterate);
 				return;
@@ -426,7 +426,7 @@ namespace Anthrax
                     return;
 				}
 			//Frost Strike
-				if (ObjectManager.LocalPlayer.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 20 && AI.Controllers.Spell.CanCast((int)Spells.FrostStrike))
+				if (ME.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 20 && AI.Controllers.Spell.CanCast((int)Spells.FrostStrike))
 				{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FrostStrike);
 				return;
@@ -437,7 +437,7 @@ namespace Anthrax
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HoW);
 				return;
 				}
-			if (ObjectManager.LocalPlayer.Auras.Where(x => x.SpellId == (int)Auras.BloodTap && x.StackCount >= 5).Any())
+			if (ME.Auras.Where(x => x.SpellId == (int)Auras.BloodTap && x.StackCount >= 5).Any())
 			{
 			//AI.Controllers.Spell.Cast((int)Spells.BloodTap, unit);
 			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodTap);
