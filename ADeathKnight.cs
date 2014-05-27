@@ -203,6 +203,16 @@ namespace Anthrax
                     return;
                 }
 				
+								// Heart Strike
+                if (AI.Controllers.Spell.CanCast((int)Spells.HS) && ME.HasAuraById((int)Auras.BloodShield) 
+				&& ME.Auras.Where(x => x.SpellId == (int)Auras.BloodShield && x.TimeLeft >= 6).Any() 
+				&&  ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Death) >= 1
+				|| AI.Controllers.Spell.CanCast((int)Spells.HS) && ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Blood) >= 1)
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HS);
+                    return;
+                }
+				
 				if (!ME.HasAuraById((int)Auras.BloodShield) && TARGET.HasAuraById((int)Auras.BloodPlague) 
 				|| (ME.HasAuraById((int)Auras.BloodShield) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodShield && x.TimeLeft <= 6000).Any()))
 				{
@@ -241,16 +251,6 @@ namespace Anthrax
                     AI.Controllers.Spell.CanCast((int)Spells.SoulReaper))
                 {
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SoulReaper);
-                    return;
-                }
-
-                // Heart Strike
-                if (AI.Controllers.Spell.CanCast((int)Spells.HS) && ME.HasAuraById((int)Auras.BloodShield) 
-				&& ME.Auras.Where(x => x.SpellId == (int)Auras.BloodShield && x.TimeLeft >= 6).Any() 
-				&&  ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Death) >= 1
-				|| AI.Controllers.Spell.CanCast((int)Spells.HS) && ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Blood) >= 1)
-                {
-                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HS);
                     return;
                 }
 				
