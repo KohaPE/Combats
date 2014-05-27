@@ -61,7 +61,7 @@ namespace Anthrax
             BloodStrike = 45902,
             ScourgeStrike = 55090,
             FesteringStrike = 85948,
-            FrostStrike = 45902,
+            FrostStrike = 49143,
             PlagueStrike = 45462,
             IcyTouch = 45477,
             DeathStrike = 49998,
@@ -325,7 +325,13 @@ namespace Anthrax
 				}
 			}
 			
-			
+			                // Frost Strike
+                if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 89 &&
+                    AI.Controllers.Spell.CanCast((int)Spells.FrostStrike))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FrostStrike);
+                    return;
+                }
             if (TARGET.Position.Distance3DFromPlayer < 7)
             {
 				//Pillar Of Frost
@@ -344,18 +350,18 @@ namespace Anthrax
                 if (!TARGET.HasAuraById((int)Auras.FrostFever) ||
                     !TARGET.HasAuraById((int)Auras.BloodPlague))
                 {
-                        if (!TARGET.HasAuraById((int)Auras.FrostFever) &&
-                            AI.Controllers.Spell.CanCast((int)Spells.HowlingBlast))
-                        {
-                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HowlingBlast);
-                            return;
-                        }
-                        if (!TARGET.HasAuraById((int)Auras.BloodPlague) &&
-                            AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike))
-                        {
-                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
-                            return;
-                        }
+                    if (!TARGET.HasAuraById((int)Auras.FrostFever) &&
+                    AI.Controllers.Spell.CanCast((int)Spells.HowlingBlast))
+                    {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HowlingBlast);
+                    return;
+                    }
+                    if (!TARGET.HasAuraById((int)Auras.BloodPlague) &&
+                    AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike))
+                    {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
+                    return;
+                    }
                                      
                 }
 				
@@ -388,7 +394,7 @@ namespace Anthrax
                 return;
             }
 			
-			if (ME.Auras.Where(x => x.SpellId == (int)Auras.BloodTap && x.StackCount >= 5).Any())
+			if (ME.Auras.Where(x => x.SpellId == (int)Auras.BloodTap && x.StackCount >= 5).Any() && AI.Controllers.Spell.CanCast((int)Spells.BloodTap))
 			{
 			//AI.Controllers.Spell.Cast((int)Spells.BloodTap, TARGET);
 			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodTap);
@@ -555,6 +561,16 @@ namespace Anthrax
                     return;
                 }
 				
+				// Heart Strike
+                if (AI.Controllers.Spell.CanCast((int)Spells.BloodBoil) && ME.HasAuraById((int)Auras.BloodShield) 
+				&& ME.Auras.Where(x => x.SpellId == (int)Auras.BloodShield && x.TimeLeft >= 6).Any() 
+				&&  ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Death) >= 1
+				|| AI.Controllers.Spell.CanCast((int)Spells.BloodBoil) && ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Blood) >= 1)
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodBoil);
+                    return;
+                }
+				
 				if (!ME.HasAuraById((int)Auras.BloodShield) && TARGET.HasAuraById((int)Auras.BloodPlague) 
 				|| (ME.HasAuraById((int)Auras.BloodShield) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodShield && x.TimeLeft <= 6000).Any()))
 				{
@@ -596,15 +612,7 @@ namespace Anthrax
                     return;
                 }
 
-                // Heart Strike
-                if (AI.Controllers.Spell.CanCast((int)Spells.BloodBoil) && ME.HasAuraById((int)Auras.BloodShield) 
-				&& ME.Auras.Where(x => x.SpellId == (int)Auras.BloodShield && x.TimeLeft >= 6).Any() 
-				&&  ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Death) >= 1
-				|| AI.Controllers.Spell.CanCast((int)Spells.BloodBoil) && ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Blood) >= 1)
-                {
-                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodBoil);
-                    return;
-                }
+
 				
 				// Horn of Winter
             if (AI.Controllers.Spell.CanCast((int)Spells.HoW))
