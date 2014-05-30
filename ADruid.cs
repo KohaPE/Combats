@@ -47,10 +47,11 @@ namespace Anthrax
         internal enum Spells : int                      //This is a convenient list of all spells used by our combat routine
         {                                               //you can have search on wowhead.com for spell name, and get the id in url
             Wrath = 5176,
-			Starfire = 2912,
+			StarFire = 2912,
             Moonfire = 8921,
 			Sunfire = 93402,
-			Starfall = 48505,
+			AstralC = 127663,
+			StarFall = 48505,
             Typhoon = 132469,
 			Starsurge = 78674,
             MightyBlast = 5211,
@@ -67,14 +68,15 @@ namespace Anthrax
             Renewal = 108238,
             MightOfUrsoc = 106922,
 			Thrash = 77758,
+			ThrashFeral = 106830,
 			Shred = 5221,
-			SavageRoar = 52610,
+			SavageRoar = 127538,
 			Rip = 1079,
 			Rake = 1822,
 			FeroBite = 22568,
 			Mangle = 33917,
 			MangleBear = 33878,
-			Mangle3 = 33876,
+			MangleFeral = 33876,
 			FF = 770,
 			TigerFury = 5217,
 			Ravage = 6785,
@@ -86,8 +88,10 @@ namespace Anthrax
 			Lacerate = 33745,
 			Maul = 6807,
 			Swipe = 779,
+			SwipeFeral = 62078,
 			SwipeBear = 106785,
 			FoN = 106737,
+			Prowl = 5215,
         }
 
         internal enum Auras : int                       //This is another convenient list of Auras used in our combat routine
@@ -101,22 +105,30 @@ namespace Anthrax
             Barkskin = 22812,
 			Rake = 1822,
 			Rip = 1079,
-			SavageRoar = 127538,
+			SavageRoar = 62071,
 			PredSwiftness = 69369,
 			Thrash = 106830,
-			Prowl = 5215,
+			ThrashFeralBear = 77758,
+			FearlBearForm = 17057,
 			CatForm = 768,
+			Prowl = 5215,
+			GlyphofS = 127540,
 			BearForm = 5487,
 			TAC = 135286,
 			DoC = 145162,
 			SavageD = 132402,
-			Solar = 48517,
-			Lunar = 48518,
+			EclipseSolar = 48517,
+			EclipseLunar = 48518,
 			Boomkin = 24858,
 			EMSolar = 67484,
 			EMLunar = 67483,
 			DreamoC = 145152,
 			ClearCast = 15700,
+			AstralInsight = 145138,
+			BoomkinCheck = 106732,
+			TankCheck = 106734,
+			FeralCheck = 106733,
+			CC = 135700,
 }
 #endregion
 
@@ -139,9 +151,18 @@ public override void OnPull(WoW.Classes.ObjectManager.WowUnit unit)
 //}
 private void castNextSpellbySinglePriority(WowUnit TARGET)
 {
+
+		var MyRage = ObjectManager.LocalPlayer.GetPower(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Rage);
+		var MyEnergy = ObjectManager.LocalPlayer.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.Energy);
+		
 	if (TARGET.Health >= 1 && ME.InCombat)
 	{
 	
+	
+	/////////////////////////////////////////////////////////////////////////////TANK SPEC////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if (ME.HasAuraById((int)Auras.TankCheck))
+	{
 	//Healing & Survival
 	{
 	if (ME.HealthPercent <= 60 && AI.Controllers.Spell.CanCast((int)Spells.FrenzyRegen))
@@ -149,7 +170,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FrenzyRegen);
 				return;
 			}
-	if (ObjectManager.LocalPlayer.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.Rage) >= 60 && AI.Controllers.Spell.CanCast((int)Spells.SavageD) && !ME.HasAuraById((int)Auras.SavageD))
+	if (MyRage >= 60 && AI.Controllers.Spell.CanCast((int)Spells.SavageD) && !ME.HasAuraById((int)Auras.SavageD))
 			{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageD);
 				return;
@@ -198,21 +219,238 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Lacerate);
 				return;
 			}			
-			
-			
-			
-			
+		}	
 		}
     }
-}}
+	
+/////////////////////////////////////////////////////////////////////////////////Boomkin///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////			
+			
+	if (ME.HasAuraById((int)Auras.BoomkinCheck))
+	{
+	//Healing & Survival
+	if(TARGET.Position.Distance3DFromPlayer <= 40)
+            {
+                // Rejuvenation
+                if (ME.HealthPercent <= 50 &&
+                    !ME.HasAuraById((int)Auras.Rejuvenation) &&
+                    AI.Controllers.Spell.CanCast((int)Spells.Rejuvenation))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rejuvenation);
+                    return;
+                }
+				
+				if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Mana) <= 80 && AI.Controllers.Spell.CanCast((int)Spells.Innervate))
+					{
+						WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Innervate);
+						return;
+					}
+					
+								                // Moonfire
+                if ((!TARGET.HasAuraById((int)Auras.Moonfire) ||
+                    TARGET.Auras.Where(x => x.SpellId == (int)Auras.Moonfire && x.TimeLeft <= 6000).Any()) &&
+                    AI.Controllers.Spell.CanCast((int)Spells.Moonfire))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Moonfire);
+                    return;
+                }
+
+                // Sunfire
+                if ((!TARGET.HasAuraById((int)Auras.Sunfire) ||
+                    TARGET.Auras.Where(x => x.SpellId == (int)Auras.Sunfire && x.TimeLeft <= 6000).Any()) &&
+                    AI.Controllers.Spell.CanCast((int)Spells.Sunfire))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Sunfire);
+                    return;
+                }
+				
+				
+                // StarFall
+                if (AI.Controllers.Spell.CanCast((int)Spells.StarFall))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.StarFall);
+                    return;
+                }
+
+                // Starsurge
+                if (AI.Controllers.Spell.CanCast((int)Spells.Starsurge))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Starsurge);
+                    return;
+                }
+
+				
+				if (ME.HasAuraById((int)Auras.AstralInsight) && AI.Controllers.Spell.CanCast((int)Spells.AstralC))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.AstralC);
+                    return;
+                }
+				
+				 // Solar
+            if (ME.HasAuraById((int)Auras.EclipseSolar))
+			{
+			
+			
+				if ((!TARGET.HasAuraById((int)Auras.Sunfire) ||
+                    TARGET.Auras.Where(x => x.SpellId == (int)Auras.Sunfire && x.TimeLeft <= 6000).Any()) &&
+                    AI.Controllers.Spell.CanCast((int)Spells.Sunfire))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Sunfire);
+                    return;
+                }
+				
+				if ((!TARGET.HasAuraById((int)Auras.Moonfire) ||
+                    TARGET.Auras.Where(x => x.SpellId == (int)Auras.Moonfire && x.TimeLeft <= 6000).Any()) &&
+                    AI.Controllers.Spell.CanCast((int)Spells.Moonfire))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Moonfire);
+                    return;
+                }
+				
+				
+                if (AI.Controllers.Spell.CanCast((int)Spells.Wrath))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Wrath);
+                    return;
+                }
+			}
+                // Lunar
+            if (ME.HasAuraById((int)Auras.EclipseLunar))
+			{
+				if ((!TARGET.HasAuraById((int)Auras.Moonfire) ||
+                    TARGET.Auras.Where(x => x.SpellId == (int)Auras.Moonfire && x.TimeLeft <= 6000).Any()) &&
+                    AI.Controllers.Spell.CanCast((int)Spells.Moonfire))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Moonfire);
+                    return;
+                }
+				
+				if ((!TARGET.HasAuraById((int)Auras.Sunfire) ||
+                    TARGET.Auras.Where(x => x.SpellId == (int)Auras.Sunfire && x.TimeLeft <= 6000).Any()) &&
+                    AI.Controllers.Spell.CanCast((int)Spells.Sunfire))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Sunfire);
+                    return;
+                }
+				
+				
+                if (AI.Controllers.Spell.CanCast((int)Spells.StarFire))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.StarFire);
+                    return;
+                }
+			}
+                // Wrath
+                if(AI.Controllers.Spell.CanCast((int)Spells.Wrath) && ME.HasAuraById((int)Auras.EMSolar))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Wrath);
+                    return;
+                }
+				// Starfire
+                if(AI.Controllers.Spell.CanCast((int)Spells.StarFire) && ME.HasAuraById((int)Auras.EMLunar))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.StarFire);
+                    return;
+                }
+				
+				if(AI.Controllers.Spell.CanCast((int)Spells.StarFire) && !ME.HasAuraById((int)Auras.EMLunar) && !ME.HasAuraById((int)Auras.EMLunar))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.StarFire);
+                    return;
+                }
+                
+            }
+    }
+	
+	////////////////////////////////////////////////////////////////Feral/////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if (ME.HasAuraById((int)Auras.FeralCheck))
+	{
+	
+//	if (!ME.InCombat && ME.UnitsAttackingMeOrPet.Count == 0 && AI.Controllers.Spell.CanCast((int)Spells.Prowl) && !ME.HasAuraById((int)Auras.Prowl))
+  //          {
+ //               Logger.WriteLine("Enter stealth ...");
+ //               WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Prowl);
+ //           }
+			
+	if (ME.HasAuraById((int)Auras.GlyphofS) && !ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageRoar);
+                    return;
+            }
+			
+	if (ME.HasAuraById((int)Auras.PredSwiftness) && AI.Controllers.Spell.CanCast((int)Spells.HealingTouch))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HealingTouch);
+                    return;
+            }
+			
+	if (TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft > 6000).Any() && AI.Controllers.Spell.CanCast((int)Spells.FeroBite) && ME.ComboPoints > 4
+	|| TARGET.HealthPercent < 25 && ME.ComboPoints > 4 && TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.FeroBite))
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FeroBite);
+                    return;
+        }
+		
+		
+	if (!TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.Rip) && ME.ComboPoints > 4
+	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft < 3000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rip) && ME.ComboPoints > 4 && AI.Controllers.Spell.CanCast((int)Spells.Rip)
+	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount <= 2).Any() && ME.ComboPoints > 4 && AI.Controllers.Spell.CanCast((int)Spells.Rip)
+	)
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rip);
+                    return;
+        }
+	
+	if (!TARGET.HasAuraById((int)Auras.Rake) && AI.Controllers.Spell.CanCast((int)Spells.Rake) && ME.ComboPoints <= 4
+	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rake && x.TimeLeft < 4000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rake)
+	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount >= 2).Any() && ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.Rake))
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rake);
+                    return;
+        }
+		
+	if (!TARGET.HasAuraById((int)Auras.Thrash) && AI.Controllers.Spell.CanCast((int)Spells.ThrashFeral) && TARGET.HasAuraById((int)Auras.Rip) && TARGET.HasAuraById((int)Auras.Rake) && ME.ComboPoints > 3)
+		{
+		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ThrashFeral);
+		}
+	
+	if (MyEnergy <= 30 && AI.Controllers.Spell.CanCast((int)Spells.TigerFury))
+		{
+		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.TigerFury);
+		}
+		
+	if (!TARGET.HasAuraById((int)Auras.FF) && AI.Controllers.Spell.CanCast((int)Spells.FF))
+		{
+		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FF);
+		}
+		
+		
+	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.MangleFeral))
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.MangleFeral);
+                    return;
+        }
+	
+	}
+	
+
+//////////////////////////////////////////////////////////////////////3	
+}////////////////////////End Single Target Rotation///////////////////
+}/////////////////////////////////////////////////////////////////////
 #endregion
 
 #region AOE>4 rotation
  private void castNextSpellbyAOEPriority(WowUnit TARGET)
 {
+
+		var MyRage = ObjectManager.LocalPlayer.GetPower(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Rage);
+		var MyEnergy = ObjectManager.LocalPlayer.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.Energy);
+		
 	if (TARGET.Health >= 1 && ME.InCombat)
 	{
-	
+	if (ME.HasAuraById((int)Auras.TankCheck))
+	{
 	//Healing & Survival
 	{
 	if (ME.HealthPercent <= 60 && AI.Controllers.Spell.CanCast((int)Spells.FrenzyRegen))
@@ -273,9 +511,71 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 			
 			
 			
-			
+		}	
 		}
     }
+	
+	
+	////////////////////////////////////////////////////////////////FERAL//////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	if (ME.HasAuraById((int)Auras.FeralCheck))
+	{
+	
+	if (ME.HasAuraById((int)Auras.GlyphofS) && !ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageRoar);
+                    return;
+            }
+			
+	if (ME.HasAuraById((int)Auras.PredSwiftness) && AI.Controllers.Spell.CanCast((int)Spells.HealingTouch))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HealingTouch);
+                    return;
+            }
+			
+	if (!TARGET.HasAuraById((int)Auras.Thrash) && AI.Controllers.Spell.CanCast((int)Spells.ThrashFeral)
+	|| ME.HasAuraById((int)Auras.DoC) && AI.Controllers.Spell.CanCast((int)Spells.ThrashFeral) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount >= 2).Any())
+		{
+		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ThrashFeral);
+		}
+	
+	if (MyEnergy <= 30 && AI.Controllers.Spell.CanCast((int)Spells.TigerFury))
+		{
+		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.TigerFury);
+		}
+	
+	
+	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.SwipeFeral) && MyEnergy > 50
+	|| ME.HasAuraById((int)Auras.CC) && AI.Controllers.Spell.CanCast((int)Spells.SwipeFeral))
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SwipeFeral);
+                    return;
+        }
+	
+	if (!TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.Rip) && ME.ComboPoints > 4)
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rip);
+                    return;
+        }
+	
+	if (!TARGET.HasAuraById((int)Auras.Rake) && AI.Controllers.Spell.CanCast((int)Spells.Rake) && ME.ComboPoints <= 4
+	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rake && x.TimeLeft < 4000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rake))
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rake);
+                    return;
+        }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	}
 }}
 #endregion
 

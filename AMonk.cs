@@ -151,7 +151,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                 return;
             }
 			
-	if (AI.Controllers.Spell.CanCast((int)Spells.Guard) && ME.HasAuraById((int)Auras.PG) && !ME.HasAuraById((int)Auras.Guard))
+	if (ME.HealthPercent <= 94 && AI.Controllers.Spell.CanCast((int)Spells.Guard) && ME.HasAuraById((int)Auras.PG) && !ME.HasAuraById((int)Auras.Guard))
 			{
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Guard);
                 return;
@@ -257,7 +257,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                 return;
             }
 			
-	if (AI.Controllers.Spell.CanCast((int)Spells.Guard) && ME.HasAuraById((int)Auras.PG) && !ME.HasAuraById((int)Auras.Guard))
+	if (ME.HealthPercent <= 94 && AI.Controllers.Spell.CanCast((int)Spells.Guard) && ME.HasAuraById((int)Auras.PG) && !ME.HasAuraById((int)Auras.Guard))
 			{
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Guard);
                 return;
@@ -274,7 +274,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
         }			
 	//Shuffle and Black out Kick	
 	if (MyChi >= 3 && AI.Controllers.Spell.CanCast((int)Spells.BOK) && !ME.HasAuraById((int)Auras.Shuffle)
-	|| MyChi >= 3 && AI.Controllers.Spell.CanCast((int)Spells.BOK) && ME.Auras.Where(x => x.SpellId == (int)Auras.Shuffle && x.TimeLeft < 12000).Any())
+	|| MyChi >= 3 && AI.Controllers.Spell.CanCast((int)Spells.BOK) && ME.Auras.Where(x => x.SpellId == (int)Auras.Shuffle && x.TimeLeft < 8000).Any())
             {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BOK);
                 return;
