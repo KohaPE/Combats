@@ -136,13 +136,14 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 			
 	//Defensive
 	
-	if (MyChi >= 1 && ME.HasAuraById((int)Auras.StagM) || ME.HasAuraById((int)Auras.StagH))
+	if (MyChi >= 1 && ME.HasAuraById((int)Auras.StagM) || ME.HasAuraById((int)Auras.StagH) 
+        || MyChi >= 1 && ME.HasAuraById((intAuras.StagL) && ME.Auras.Where(x => x.SpellId == (int)Auras.StagL && x.TimeLeft <= 7000).Any() )
 			{
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PureBrew);
                 return;
             }
 			
-	if (ME.HealthPercent < 90 && ME.Auras.Where(x => x.SpellId == (int)Auras.ElusiveBrew && x.StackCount >= 5).Any() &&
+	if (ME.Auras.Where(x => x.SpellId == (int)Auras.ElusiveBrew && x.StackCount >= 5).Any() &&
             AI.Controllers.Spell.CanCast((int)Spells.ElusiveBrew) && !ME.HasAuraById((int)Auras.Elusive)
 	|| ME.Auras.Where(x => x.SpellId == (int)Auras.ElusiveBrew && x.StackCount >= 15).Any() &&
             AI.Controllers.Spell.CanCast((int)Spells.ElusiveBrew) && !ME.HasAuraById((int)Auras.Elusive))
@@ -160,8 +161,8 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	
 
 	//Rotation!!!
-	if (MyChi >= 3 && AI.Controllers.Spell.CanCast((int)Spells.BOK) && !ME.HasAuraById((int)Auras.Shuffle)
-	|| MyChi >= 3 && AI.Controllers.Spell.CanCast((int)Spells.BOK) && ME.Auras.Where(x => x.SpellId == (int)Auras.Shuffle && x.TimeLeft < 12000).Any())
+	if (AI.Controllers.Spell.CanCast((int)Spells.BOK) && !ME.HasAuraById((int)Auras.Shuffle)
+	|| AI.Controllers.Spell.CanCast((int)Spells.BOK) && ME.Auras.Where(x => x.SpellId == (int)Auras.Shuffle && x.TimeLeft < 12000).Any())
             {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BOK);
                 return;
@@ -175,14 +176,14 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
             }
 	
 	
-	if (MyChi <= 2 && AI.Controllers.Spell.CanCast((int)Spells.KegSmash))
+	if (MyChi <= 3 && AI.Controllers.Spell.CanCast((int)Spells.KegSmash))
             {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.KegSmash);
                 return;
             }
 			
 			
-	if (MyChi < 3 && AI.Controllers.Spell.CanCast((int)Spells.Jab))
+	if (MyChi < 4 && AI.Controllers.Spell.CanCast((int)Spells.Jab))
             {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Jab);
                 return;
@@ -242,13 +243,14 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 			
 	//Defensive
 	
-	if (MyChi >= 1 && ME.HasAuraById((int)Auras.StagM) || ME.HasAuraById((int)Auras.StagH))
+	if (MyChi >= 1 && ME.HasAuraById((int)Auras.StagM) || ME.HasAuraById((int)Auras.StagH)
+        || MyChi >= 1 && ME.HasAuraById((intAuras.StagL) && ME.Auras.Where(x => x.SpellId == (int)Auras.StagL && x.TimeLeft <= 7000).Any() )
 			{
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PureBrew);
                 return;
             }
 			
-	if (ME.HealthPercent < 90 && ME.Auras.Where(x => x.SpellId == (int)Auras.ElusiveBrew && x.StackCount >= 5).Any() &&
+	if (ME.Auras.Where(x => x.SpellId == (int)Auras.ElusiveBrew && x.StackCount >= 5).Any() &&
             AI.Controllers.Spell.CanCast((int)Spells.ElusiveBrew) && !ME.HasAuraById((int)Auras.Elusive)
 	|| ME.Auras.Where(x => x.SpellId == (int)Auras.ElusiveBrew && x.StackCount >= 15).Any() &&
             AI.Controllers.Spell.CanCast((int)Spells.ElusiveBrew) && !ME.HasAuraById((int)Auras.Elusive))
@@ -257,12 +259,6 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                 return;
             }
 			
-	if (ME.HealthPercent <= 94 && AI.Controllers.Spell.CanCast((int)Spells.Guard) && ME.HasAuraById((int)Auras.PG) && !ME.HasAuraById((int)Auras.Guard))
-			{
-                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Guard);
-                return;
-            }
-	
 	
 	//ROTATION!!!!
 	if (TARGET.Position.Distance3DFromPlayer < 8)
@@ -273,15 +269,15 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
             return;
         }			
 	//Shuffle and Black out Kick	
-	if (MyChi >= 3 && AI.Controllers.Spell.CanCast((int)Spells.BOK) && !ME.HasAuraById((int)Auras.Shuffle)
-	|| MyChi >= 3 && AI.Controllers.Spell.CanCast((int)Spells.BOK) && ME.Auras.Where(x => x.SpellId == (int)Auras.Shuffle && x.TimeLeft < 8000).Any())
+	if (AI.Controllers.Spell.CanCast((int)Spells.BOK) && !ME.HasAuraById((int)Auras.Shuffle)
+	|| AI.Controllers.Spell.CanCast((int)Spells.BOK) && ME.Auras.Where(x => x.SpellId == (int)Auras.Shuffle && x.TimeLeft < 8000).Any())
             {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BOK);
                 return;
             }
 	//Breath of Fire		
 	if (MyChi >= 3 && AI.Controllers.Spell.CanCast((int)Spells.BoF) && TARGET.HasAuraById((int)Auras.DHaze1)
-	&& ME.Auras.Where(x => x.SpellId == (int)Auras.Shuffle && x.TimeLeft < 12000).Any())
+	&& ME.Auras.Where(x => x.SpellId == (int)Auras.Shuffle && x.TimeLeft > 8000).Any())
             {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BoF);
                 return;
