@@ -31,6 +31,7 @@ namespace Anthrax
         #region private vars
         bool isAOE;
         WowLocalPlayer ME;
+		Settings CCSettings = new Settings();
         //Stopwatch stopwatch;
         //List<long> averageScanTimes;
         #endregion
@@ -165,9 +166,15 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	{
 	//Healing & Survival
 	{
-	if (ME.HealthPercent <= 60 && AI.Controllers.Spell.CanCast((int)Spells.FrenzyRegen))
+	if (ME.HealthPercent < CCSettings.FrenzyRegen && AI.Controllers.Spell.CanCast((int)Spells.FrenzyRegen))
 			{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FrenzyRegen);
+				return;
+			}
+			
+		if (ME.HealthPercent < CCSettings.Barkskin && AI.Controllers.Spell.CanCast((int)Spells.Barkskin))
+			{
+				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Barkskin);
 				return;
 			}
 	if (MyRage >= 60 && AI.Controllers.Spell.CanCast((int)Spells.SavageD) && !ME.HasAuraById((int)Auras.SavageD))
@@ -182,7 +189,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 			}
 
 			
-		if (TARGET.Position.Distance3DFromPlayer < 7)
+		if (TARGET.Position.Distance3DFromPlayer < 8)
 		{
 		//Mangle!!!
 			if (AI.Controllers.Spell.CanCast((int)Spells.MangleBear))
@@ -453,12 +460,18 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	{
 	//Healing & Survival
 	{
-	if (ME.HealthPercent <= 60 && AI.Controllers.Spell.CanCast((int)Spells.FrenzyRegen))
+	if (ME.HealthPercent < CCSettings.FrenzyRegen && AI.Controllers.Spell.CanCast((int)Spells.FrenzyRegen))
 			{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FrenzyRegen);
 				return;
 			}
-	if (ObjectManager.LocalPlayer.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.Rage) >= 60 && AI.Controllers.Spell.CanCast((int)Spells.SavageD) && !ME.HasAuraById((int)Auras.SavageD))
+			
+		if (ME.HealthPercent < CCSettings.Barkskin && AI.Controllers.Spell.CanCast((int)Spells.Barkskin))
+			{
+				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Barkskin);
+				return;
+			}
+	if (MyRage >= 60 && AI.Controllers.Spell.CanCast((int)Spells.SavageD) && !ME.HasAuraById((int)Auras.SavageD))
 			{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageD);
 				return;
@@ -468,8 +481,9 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HealingTouch);
 				return;
 			}
+
 	
-		if (TARGET.Position.Distance3DFromPlayer < 8)
+		if (TARGET.Position.Distance3DFromPlayer < 5)
 		{
 			if (AI.Controllers.Spell.CanCast((int)Spells.Thrash) && !TARGET.HasAuraById((int)Auras.Thrash))
 			{
@@ -619,11 +633,38 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 
         public override void OnLoad()   //This is called when the Customclass is loaded in SPQR
         {
+		try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(Settings));
+
+                using (StreamReader rd = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "\\Combats\\ADruid.xml"))
+                {
+                    CCSettings = xs.Deserialize(rd) as Settings;
+                }
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                if (CCSettings == null)
+                    CCSettings = new Settings();
+            }
             Logger.WriteLine("CustomClass " + Name + " Loaded");
         }
 
         public override void OnUnload() //This is called when the Customclass is unloaded in SPQR
         {
+		            try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(Settings));
+                using (StreamWriter wr = new StreamWriter(AppDomain.CurrentDomain.BaseDirectory + "\\Combats\\nrgdRET.xml"))
+                {
+                    xs.Serialize(wr, CCSettings);
+                }
+            }
+            catch { }
  
             Logger.WriteLine("CustomClass " + Name + " Unloaded, Goodbye !");
         }
@@ -642,4 +683,48 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
         {
             Logger.WriteLine("Stopping " + Name + " routine... gl smashing keys.");
         }
+		
+		public override object SettingsProperty
+        {
+            get
+            {
+                return CCSettings;
+            }
+        }
+		[Serializable]
+    public class Settings
+    {
+        public int FrenzyRegen = 80;
+        public int Barkskin = 70;
+
+        [XmlIgnore]
+        [CategoryAttribute("Survival Settings"),
+        DisplayName("Frenzy Regen?"), DefaultValueAttribute(80)]
+        public int _FrenzyRegen
+        {
+            get
+            {
+                return FrenzyRegen;
+            }
+            set
+            {
+                FrenzyRegen = value;
+            }
+        }
+       [XmlIgnore]
+        [CategoryAttribute("Survival Settings"),
+        DisplayName("Barkskin"), DefaultValueAttribute(80)]
+        public int _Barkskin
+        {
+            get
+            {
+                return Barkskin;
+            }
+            set
+            {
+                Barkskin = value;
+            }
+        }
+
+	}
 }}

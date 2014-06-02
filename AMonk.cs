@@ -58,9 +58,15 @@ namespace Anthrax
 			DampHarm = 122278,
 			ElusiveBrew = 115308,
 			ZP = 124081,
+			ChiBrew = 115399,
 			SCK = 101546,
 			PureBrew = 119582,
 			ChiWave = 115098,
+			CJL = 117952,
+			ManaTea = 115294,
+			Renew = 115151,
+			Uplift = 116670,
+			SurgingMist = 123273,
         }
 
         internal enum Auras : int                       //This is another convenient list of Auras used in our combat routine
@@ -80,6 +86,13 @@ namespace Anthrax
 			DHaze2 = 116330,
 			TankCheck = 120267,
 			TP = 125359,
+			HealingCheck = 116346,
+			ManaTea = 115867,
+			VM = 118674,
+			SZ = 127722,
+			RM = 119611,
+			MM = 139597,
+			GlyphofMT = 123763,
 }
 #endregion
 
@@ -105,13 +118,17 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 
 		var MyChi = ObjectManager.LocalPlayer.GetPower(WoW.Classes.ObjectManager.WowUnit.WowPowerType.MonkChi);
 		var MyEnergy = ObjectManager.LocalPlayer.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.Energy);
+		var IsCasting = ObjectManager.LocalPlayer.IsCasting;
 
 	if (TARGET.Health >= 1 && ME.InCombat)
 	{
+	
+	////////////////////////////////////////////////////Brewmaster///////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////
 	if (ME.HasAuraById((int)Auras.TankCheck))
 	{
 	//Healing & Survival
-	{
+	
 	
 	
 	if (ME.HealthPercent <= 95 && MyChi >= 3 && AI.Controllers.Spell.CanCast((int)Spells.Guard) && ME.HasAuraById((int)Auras.PG) && !ME.HasAuraById((int)Auras.Guard))
@@ -125,6 +142,12 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
             {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ZP);
                 return;
+            }
+			else
+	if (AI.Controllers.Spell.CanCast((int)Spells.ChiWave)) 
+            {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ChiWave);
+                return;
             }	
 			
 			
@@ -134,18 +157,23 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                 return;
             }
 			
+			
+	if (MyChi <= 1 && MyEnergy <= 30 && AI.Controllers.Spell.CanCast((int)Spells.ChiBrew))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ChiBrew);
+                return;
+            }
 	//Defensive
 	
 	if (MyChi >= 1 && ME.HasAuraById((int)Auras.StagM) || ME.HasAuraById((int)Auras.StagH) 
-        || MyChi >= 1 && ME.HasAuraById((intAuras.StagL) && ME.Auras.Where(x => x.SpellId == (int)Auras.StagL && x.TimeLeft <= 7000).Any() )
+        || MyChi >= 1 && ME.HasAuraById((int)Auras.StagL) && ME.Auras.Where(x => x.SpellId == (int)Auras.StagL && x.TimeLeft <= 8000).Any()
+		|| ME.HealthPercent <= 80 && MyChi >= 1 && ME.HasAuraById((int)Auras.StagL) && ME.Auras.Where(x => x.SpellId == (int)Auras.StagL && x.TimeLeft <= 8000).Any())
 			{
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PureBrew);
                 return;
             }
 			
-	if (ME.Auras.Where(x => x.SpellId == (int)Auras.ElusiveBrew && x.StackCount >= 5).Any() &&
-            AI.Controllers.Spell.CanCast((int)Spells.ElusiveBrew) && !ME.HasAuraById((int)Auras.Elusive)
-	|| ME.Auras.Where(x => x.SpellId == (int)Auras.ElusiveBrew && x.StackCount >= 15).Any() &&
+	if (ME.Auras.Where(x => x.SpellId == (int)Auras.ElusiveBrew && x.StackCount >= 10).Any() &&
             AI.Controllers.Spell.CanCast((int)Spells.ElusiveBrew) && !ME.HasAuraById((int)Auras.Elusive))
             {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ElusiveBrew);
@@ -161,6 +189,13 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	
 
 	//Rotation!!!
+	
+	if (MyChi < 3 && AI.Controllers.Spell.CanCast((int)Spells.KegSmash))
+            {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.KegSmash);
+                return;
+            }
+	
 	if (AI.Controllers.Spell.CanCast((int)Spells.BOK) && !ME.HasAuraById((int)Auras.Shuffle)
 	|| AI.Controllers.Spell.CanCast((int)Spells.BOK) && ME.Auras.Where(x => x.SpellId == (int)Auras.Shuffle && x.TimeLeft < 12000).Any())
             {
@@ -175,12 +210,6 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                 return;
             }
 	
-	
-	if (MyChi <= 3 && AI.Controllers.Spell.CanCast((int)Spells.KegSmash))
-            {
-                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.KegSmash);
-                return;
-            }
 			
 			
 	if (MyChi < 4 && AI.Controllers.Spell.CanCast((int)Spells.Jab))
@@ -188,21 +217,123 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Jab);
                 return;
             }
-	
-	if (MyChi >= 3 && AI.Controllers.Spell.CanCast((int)Spells.BOK))
-			{
+	if (AI.Controllers.Spell.CanCast((int)Spells.BOK) && MyChi > 2)
+            {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BOK);
                 return;
-            }	
+            }
 			
-			
-			if (AI.Controllers.Spell.CanCast((int)Spells.TigerPalm))
+	if (AI.Controllers.Spell.CanCast((int)Spells.TigerPalm))
 			{
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.TigerPalm);
                 return;
             }
+		
 	}
-    }
+    
+	
+	//////////////////////////////////////////////////FistWeaving/////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	if (ME.HasAuraById((int)Auras.HealingCheck))
+	{
+	if (!IsCasting)
+	{
+	//Chi Capping Code
+		if (MyChi >= 4 && AI.Controllers.Spell.CanCast((int)Spells.BOK) && ME.HasAuraById((int)Auras.MM))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BOK);
+                return;
+            }
+		if (MyChi >= 4 && AI.Controllers.Spell.CanCast((int)Spells.Uplift) && ME.HasAuraById((int)Auras.RM) && ME.HealthPercent <= 70)
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Uplift);
+                return;
+            }
+			
+	//Mana Tea Code.
+		if (ME.Auras.Where(x => x.SpellId == (int)Auras.ManaTea && x.StackCount >= 2).Any() && ME.HasAuraById((int)Auras.GlyphofMT) &&
+            AI.Controllers.Spell.CanCast((int)Spells.ManaTea) && ObjectManager.LocalPlayer.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Mana) <= 90
+			|| ME.HasAuraById((int)Auras.ManaTea) && ObjectManager.LocalPlayer.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Mana) <= 10)
+            {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ManaTea);
+                return;
+            }
+			
+		if (ME.Auras.Where(x => x.SpellId == (int)Auras.ManaTea && x.StackCount >= 5).Any() &&
+            AI.Controllers.Spell.CanCast((int)Spells.ManaTea) && ObjectManager.LocalPlayer.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Mana) <= 80
+			|| ME.HasAuraById((int)Auras.ManaTea) && ObjectManager.LocalPlayer.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Mana) <= 10)
+            {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ManaTea);
+                return;
+            }
+			
+		if (AI.Controllers.Spell.CanCast((int)Spells.Renew))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Renew);
+                return;
+            }	
+		if (AI.Controllers.Spell.CanCast((int)Spells.ChiWave))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ChiWave);
+                return;
+            }	
+			
+		if (ME.Auras.Where(x => x.SpellId == (int)Auras.VM && x.StackCount >= 5).Any() &&
+            AI.Controllers.Spell.CanCast((int)Spells.SurgingMist))
+            {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SurgingMist);
+                return;
+            }	
+
+		if (!ME.HasAuraById((int)Auras.SZ) && AI.Controllers.Spell.CanCast((int)Spells.BOK) && MyChi >= 2 && ME.HasAuraById((int)Auras.MM))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BOK);
+                return;
+            }
+		if (!ME.HasAuraById((int)Auras.TP) && AI.Controllers.Spell.CanCast((int)Spells.TigerPalm) && ME.HasAuraById((int)Auras.MM)
+		|| ME.HasAuraById((int)Auras.MM) && AI.Controllers.Spell.CanCast((int)Spells.TigerPalm) && MyChi > 1)
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.TigerPalm);
+                return;
+            }		
+
+		if (!ME.HasAuraById((int)Auras.MM) && AI.Controllers.Spell.CanCast((int)Spells.Jab))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Jab);
+                return;
+            }	
+		
+		if (TARGET.Position.Distance3DFromPlayer > 10 && AI.Controllers.Spell.CanCast((int)Spells.CJL))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.CJL);
+                return;
+            }			
+		
+	
+	
+	
+	
+	
+	}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
 }
 #endregion
@@ -212,7 +343,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 {
 		var MyChi = ObjectManager.LocalPlayer.GetPower(WoW.Classes.ObjectManager.WowUnit.WowPowerType.MonkChi);
 		var MyEnergy = ObjectManager.LocalPlayer.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.Energy);
-		
+		var IsCasting = ObjectManager.LocalPlayer.IsCasting;
 		
 	if (TARGET.Health >= 1 && ME.InCombat)
 	{
@@ -232,6 +363,12 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
             {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ZP);
                 return;
+            }
+			else
+	if (AI.Controllers.Spell.CanCast((int)Spells.ChiWave)) 
+            {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ChiWave);
+                return;
             }	
 			
 			
@@ -241,21 +378,32 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                 return;
             }
 			
+			
+	if (MyChi <= 1 && MyEnergy <= 30 && AI.Controllers.Spell.CanCast((int)Spells.ChiBrew))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ChiBrew);
+                return;
+            }
 	//Defensive
 	
-	if (MyChi >= 1 && ME.HasAuraById((int)Auras.StagM) || ME.HasAuraById((int)Auras.StagH)
-        || MyChi >= 1 && ME.HasAuraById((intAuras.StagL) && ME.Auras.Where(x => x.SpellId == (int)Auras.StagL && x.TimeLeft <= 7000).Any() )
+	if (MyChi >= 1 && ME.HasAuraById((int)Auras.StagM) || ME.HasAuraById((int)Auras.StagH) 
+        || MyChi >= 1 && ME.HasAuraById((int)Auras.StagL) && ME.Auras.Where(x => x.SpellId == (int)Auras.StagL && x.TimeLeft <= 8000).Any()
+		|| ME.HealthPercent <= 80 && MyChi >= 1 && ME.HasAuraById((int)Auras.StagL) && ME.Auras.Where(x => x.SpellId == (int)Auras.StagL && x.TimeLeft <= 8000).Any())
 			{
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PureBrew);
                 return;
             }
 			
-	if (ME.Auras.Where(x => x.SpellId == (int)Auras.ElusiveBrew && x.StackCount >= 5).Any() &&
-            AI.Controllers.Spell.CanCast((int)Spells.ElusiveBrew) && !ME.HasAuraById((int)Auras.Elusive)
-	|| ME.Auras.Where(x => x.SpellId == (int)Auras.ElusiveBrew && x.StackCount >= 15).Any() &&
+	if (ME.Auras.Where(x => x.SpellId == (int)Auras.ElusiveBrew && x.StackCount >= 10).Any() &&
             AI.Controllers.Spell.CanCast((int)Spells.ElusiveBrew) && !ME.HasAuraById((int)Auras.Elusive))
             {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ElusiveBrew);
+                return;
+            }
+			
+	if (ME.HealthPercent <= 94 && AI.Controllers.Spell.CanCast((int)Spells.Guard) && ME.HasAuraById((int)Auras.PG) && !ME.HasAuraById((int)Auras.Guard))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Guard);
                 return;
             }
 			
@@ -263,11 +411,18 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	//ROTATION!!!!
 	if (TARGET.Position.Distance3DFromPlayer < 8)
 		{
-	if (AI.Controllers.Spell.CanCast((int)Spells.RJW) && !ME.HasAuraById((int)Auras.RJW)) 
+	if (AI.Controllers.Spell.CanCast((int)Spells.RJW)) 
         {
             WoW.Internals.ActionBar.ExecuteSpell((int)Spells.RJW);
             return;
-        }			
+        }		
+
+	//Keg Smash
+	if (MyChi <= 2 && AI.Controllers.Spell.CanCast((int)Spells.KegSmash))
+            {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.KegSmash);
+                return;
+            }		
 	//Shuffle and Black out Kick	
 	if (AI.Controllers.Spell.CanCast((int)Spells.BOK) && !ME.HasAuraById((int)Auras.Shuffle)
 	|| AI.Controllers.Spell.CanCast((int)Spells.BOK) && ME.Auras.Where(x => x.SpellId == (int)Auras.Shuffle && x.TimeLeft < 8000).Any())
@@ -276,8 +431,8 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                 return;
             }
 	//Breath of Fire		
-	if (MyChi >= 3 && AI.Controllers.Spell.CanCast((int)Spells.BoF) && TARGET.HasAuraById((int)Auras.DHaze1)
-	&& ME.Auras.Where(x => x.SpellId == (int)Auras.Shuffle && x.TimeLeft > 8000).Any())
+	if (MyChi >= 2 && AI.Controllers.Spell.CanCast((int)Spells.BoF) && TARGET.HasAuraById((int)Auras.DHaze1)
+	&& ME.Auras.Where(x => x.SpellId == (int)Auras.Shuffle && x.TimeLeft > 4000).Any() && !TARGET.HasAuraById((int)Auras.BoF))
             {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BoF);
                 return;
@@ -289,41 +444,114 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.TigerPalm);
                 return;
             }
-	
-	//Keg Smash
-	if (MyChi <= 2 && AI.Controllers.Spell.CanCast((int)Spells.KegSmash))
-            {
-                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.KegSmash);
-                return;
-            }
+
 			
 			
-	if (MyChi < 3 && AI.Controllers.Spell.CanCast((int)Spells.Jab))
+	if (MyChi < 3 && AI.Controllers.Spell.CanCast((int)Spells.Jab) && MyEnergy >= 60)
             {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Jab);
                 return;
             }
 	
-	if (MyChi >= 3 && AI.Controllers.Spell.CanCast((int)Spells.BOK))
+	if (MyChi > 2 && AI.Controllers.Spell.CanCast((int)Spells.BOK))
 			{
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BOK);
                 return;
             }	
-			
-			
-			if (AI.Controllers.Spell.CanCast((int)Spells.TigerPalm))
+		
+	if (AI.Controllers.Spell.CanCast((int)Spells.TigerPalm))
 			{
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.TigerPalm);
                 return;
             }
-		
-		
 			
 			
 			
 			
 		}
     }
+
+		//////////////////////////////////////////////////FistWeaving/////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	if (ME.HasAuraById((int)Auras.HealingCheck))
+	{
+	if (!IsCasting)
+	{
+	//Chi Capping Code
+		if (MyChi >= 4 && AI.Controllers.Spell.CanCast((int)Spells.BOK) && ME.HasAuraById((int)Auras.MM))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BOK);
+                return;
+            }
+		if (MyChi >= 4 && AI.Controllers.Spell.CanCast((int)Spells.Uplift) && ME.HasAuraById((int)Auras.RM) && ME.HealthPercent <= 70)
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Uplift);
+                return;
+            }
+			
+	//Mana Tea Code.
+		if (ME.Auras.Where(x => x.SpellId == (int)Auras.ManaTea && x.StackCount >= 2).Any() && ME.HasAuraById((int)Auras.GlyphofMT) &&
+            AI.Controllers.Spell.CanCast((int)Spells.ManaTea) && ObjectManager.LocalPlayer.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Mana) <= 90
+			|| ME.HasAuraById((int)Auras.ManaTea) && ObjectManager.LocalPlayer.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Mana) <= 10)
+            {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ManaTea);
+                return;
+            }
+			
+		if (ME.Auras.Where(x => x.SpellId == (int)Auras.ManaTea && x.StackCount >= 5).Any() &&
+            AI.Controllers.Spell.CanCast((int)Spells.ManaTea) && ObjectManager.LocalPlayer.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Mana) <= 80
+			|| ME.HasAuraById((int)Auras.ManaTea) && ObjectManager.LocalPlayer.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Mana) <= 10)
+            {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ManaTea);
+                return;
+            }
+			
+		if (AI.Controllers.Spell.CanCast((int)Spells.Renew))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Renew);
+                return;
+            }	
+		if (AI.Controllers.Spell.CanCast((int)Spells.ChiWave))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ChiWave);
+                return;
+            }	
+			
+		if (ME.Auras.Where(x => x.SpellId == (int)Auras.VM && x.StackCount >= 5).Any() &&
+            AI.Controllers.Spell.CanCast((int)Spells.SurgingMist))
+            {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SurgingMist);
+                return;
+            }	
+
+			
+		if (AI.Controllers.Spell.CanCast((int)Spells.RJW)) 
+        {
+            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.RJW);
+            return;
+        }	
+		
+		if (!ME.HasAuraById((int)Auras.SZ) && AI.Controllers.Spell.CanCast((int)Spells.BOK) && MyChi >= 2 && ME.HasAuraById((int)Auras.MM))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BOK);
+                return;
+            }
+		if (!ME.HasAuraById((int)Auras.TP) && AI.Controllers.Spell.CanCast((int)Spells.TigerPalm) && ME.HasAuraById((int)Auras.MM)
+		|| ME.HasAuraById((int)Auras.MM) && AI.Controllers.Spell.CanCast((int)Spells.TigerPalm) && MyChi > 1)
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.TigerPalm);
+                return;
+            }		
+		
+		if (!ME.HasAuraById((int)Auras.MM) && MyChi < 4 && AI.Controllers.Spell.CanCast((int)Spells.Jab))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Jab);
+                return;
+            }	
+	}
+	}
+	
 }}
 #endregion
 
