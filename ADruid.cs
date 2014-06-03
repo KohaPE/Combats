@@ -111,7 +111,7 @@ namespace Anthrax
 			Thrash = 106830,
 			ThrashFeralBear = 77758,
 			FearlBearForm = 17057,
-			CatForm = 768,
+			CatForm = 3025,
 			Prowl = 5215,
 			GlyphofS = 127540,
 			BearForm = 5487,
@@ -162,6 +162,81 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	
 	/////////////////////////////////////////////////////////////////////////////TANK SPEC////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+						///////////Cat Form In Tank Spec//////////////
+	if (ME.HasAuraById((int)Auras.CatForm) && ME.HasAuraById((int)Auras.TankCheck))
+	{
+	if (ME.HasAuraById((int)Auras.Prowl))
+	{
+	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Ravage);
+                    return;
+            }
+			
+	if (AI.Controllers.Spell.CanCast((int)Spells.Pounce))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Pounce);
+                    return;
+            }
+	
+	
+	
+	}
+
+	if (!ME.HasAuraById((int)Auras.Prowl))
+	{
+	if (ME.HasAuraById((int)Auras.PredSwiftness) && AI.Controllers.Spell.CanCast((int)Spells.HealingTouch))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HealingTouch);
+                    return;
+            }
+			
+	if (TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft > 6000).Any() && AI.Controllers.Spell.CanCast((int)Spells.FeroBite) && ME.ComboPoints > 4
+	|| TARGET.HealthPercent < 25 && ME.ComboPoints > 4 && TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.FeroBite))
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FeroBite);
+                    return;
+        }
+		
+		
+	if (!TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.Rip) && ME.ComboPoints > 4
+	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft < 3000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rip) && ME.ComboPoints > 4 && AI.Controllers.Spell.CanCast((int)Spells.Rip)
+	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount <= 2).Any() && ME.ComboPoints > 4 && AI.Controllers.Spell.CanCast((int)Spells.Rip)
+	)
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rip);
+                    return;
+        }
+	
+	if (!TARGET.HasAuraById((int)Auras.Rake) && AI.Controllers.Spell.CanCast((int)Spells.Rake) && ME.ComboPoints <= 4
+	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rake && x.TimeLeft < 4000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rake)
+	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount >= 2).Any() && ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.Rake))
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rake);
+                    return;
+        }
+		
+	if (!TARGET.HasAuraById((int)Auras.Thrash) && AI.Controllers.Spell.CanCast((int)Spells.ThrashFeral) && TARGET.HasAuraById((int)Auras.Rip) && TARGET.HasAuraById((int)Auras.Rake) && ME.ComboPoints > 3)
+		{
+		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ThrashFeral);
+		}
+		
+	if (!TARGET.HasAuraById((int)Auras.FF) && AI.Controllers.Spell.CanCast((int)Spells.FF))
+		{
+		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FF);
+		}
+		
+		
+	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.MangleFeral))
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.MangleFeral);
+                    return;
+        }		
+		}
+}
+
+					/////////////////////////////Bear Form///////////////////////////////
 	if (ME.HasAuraById((int)Auras.TankCheck))
 	{
 	//Healing & Survival
@@ -225,7 +300,10 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 			{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Lacerate);
 				return;
-			}			
+			}
+
+
+
 		}	
 		}
     }
@@ -236,7 +314,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	if (ME.HasAuraById((int)Auras.BoomkinCheck))
 	{
 	//Healing & Survival
-	if(TARGET.Position.Distance3DFromPlayer <= 40)
+	if(TARGET.Position.Distance3DFromPlayer <= 40 && !ME.IsCasting)
             {
                 // Rejuvenation
                 if (ME.HealthPercent <= 50 &&
@@ -621,14 +699,14 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
             SPQR.Logger.WriteLine("Elapsed:  " + stopwatch.ElapsedMilliseconds.ToString() + " miliseconds, average:" + (averageScanTimes.Sum() / averageScanTimes.Count()).ToString() + ",Max:" + averageScanTimes.Max());
             stopwatch.Restart();
              */
-            if (!Cooldown.IsGlobalCooldownActive && TARGET.IsValid)
+            if (!Cooldown.IsGlobalCooldownActive)
             {
                 if (isAOE) { castNextSpellbyAOEPriority(TARGET); } else { castNextSpellbySinglePriority(TARGET); }
             }
             if ((GetAsyncKeyState(90) == -32767))
             {
                 changeRotation();
-            }
+            }	
         }
 
         public override void OnLoad()   //This is called when the Customclass is loaded in SPQR
@@ -698,8 +776,8 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
         public int Barkskin = 70;
 
         [XmlIgnore]
-        [CategoryAttribute("Survival Settings"),
-        DisplayName("Frenzy Regen?"), DefaultValueAttribute(80)]
+        [CategoryAttribute("Tank Settings"),
+        DisplayName("Frenzy Regen?"), DefaultValueAttribute(90)]
         public int _FrenzyRegen
         {
             get
