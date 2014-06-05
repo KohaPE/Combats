@@ -183,7 +183,7 @@ namespace Anthrax
 			}
 			
 			
-            if (TARGET.Position.Distance3DFromPlayer < 7)
+            if (TARGET.Position.Distance3DFromPlayer > 10 && TARGET.Position.Distance3DFromPlayer < 30)
             {
 
                 // Deseases
@@ -332,7 +332,7 @@ namespace Anthrax
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FrostStrike);
                     return;
                 }
-            if (TARGET.Position.Distance3DFromPlayer < 7)
+            if (TARGET.Position.Distance3DFromPlayer > 10 && TARGET.Position.Distance3DFromPlayer < 30)
             {
 				//Pillar Of Frost
 				if (!ME.HasAuraById((int)Auras.PoF) && AI.Controllers.Spell.CanCast((int)Spells.PoF))
@@ -541,7 +541,7 @@ namespace Anthrax
 			}
 			
 			
-            if (TARGET.Position.Distance3DFromPlayer < 20)
+            if (TARGET.Position.Distance3DFromPlayer > 10 && TARGET.Position.Distance3DFromPlayer < 30)
             {
 
                 // Deseases
@@ -669,7 +669,7 @@ namespace Anthrax
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PoF);
 				}
 			
-			if (TARGET.Position.Distance3DFromPlayer < 20 && AI.Controllers.Spell.CanCast((int)Spells.UnholyBlight))
+			if (TARGET.Position.Distance3DFromPlayer > 10 && TARGET.Position.Distance3DFromPlayer < 30 && AI.Controllers.Spell.CanCast((int)Spells.UnholyBlight))
 				{
 					WoW.Internals.ActionBar.ExecuteSpell((int)Spells.UnholyBlight);
 					return;
