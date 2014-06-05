@@ -541,7 +541,7 @@ namespace Anthrax
 			}
 			
 			
-            if (TARGET.Position.Distance3DFromPlayer < 7)
+            if (TARGET.Position.Distance3DFromPlayer < 20)
             {
 
                 // Deseases
@@ -669,7 +669,7 @@ namespace Anthrax
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PoF);
 				}
 			
-			if (TARGET.Position.Distance3DFromPlayer < 10 && AI.Controllers.Spell.CanCast((int)Spells.UnholyBlight))
+			if (TARGET.Position.Distance3DFromPlayer < 20 && AI.Controllers.Spell.CanCast((int)Spells.UnholyBlight))
 				{
 					WoW.Internals.ActionBar.ExecuteSpell((int)Spells.UnholyBlight);
 					return;
@@ -751,7 +751,7 @@ namespace Anthrax
             SPQR.Logger.WriteLine("Elapsed:  " + stopwatch.ElapsedMilliseconds.ToString() + " miliseconds, average:" + (averageScanTimes.Sum() / averageScanTimes.Count()).ToString() + ",Max:" + averageScanTimes.Max());
             stopwatch.Restart();
              */
-            if (!Cooldown.IsGlobalCooldownActive && TARGET.IsValid)
+            if (!Cooldown.IsGlobalCooldownActive)
             {
                 if (isAOE) { castNextSpellbyAOEPriority(TARGET); } else { castNextSpellbySinglePriority(TARGET); }
             }
