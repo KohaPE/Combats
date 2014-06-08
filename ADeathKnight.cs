@@ -183,17 +183,16 @@ namespace Anthrax
 			}
 			
 			
-            if (TARGET.Position.Distance3DFromPlayer > 10 && TARGET.Position.Distance3DFromPlayer < 30)
-            {
 
                 // Deseases
 				
-				if (ME.HasAuraById((int)Auras.CS))
+				if (ME.HasAuraById((int)Auras.CS) && TARGET.Position.Distance3DFromPlayer <= 15)
 				{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodBoil);
                     return;
 				}
-
+				if (TARGET.Position.Distance3DFromPlayer <= 15)
+				{
                 if ((TARGET.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft < 8000).Any() ||
                    TARGET.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft < 8000).Any()) &&
                     AI.Controllers.Spell.CanCast((int)Spells.BloodBoil)
@@ -202,7 +201,7 @@ namespace Anthrax
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodBoil);
                     return;
                 }
-				
+				}
 								// Heart Strike
                 if (AI.Controllers.Spell.CanCast((int)Spells.HS) && ME.HasAuraById((int)Auras.BloodShield) 
 				&& ME.Auras.Where(x => x.SpellId == (int)Auras.BloodShield && x.TimeLeft >= 6).Any() 
@@ -269,7 +268,7 @@ namespace Anthrax
                     return;
                 }
 
-            }
+            
             else
             {
                 // Death Coil
@@ -316,7 +315,7 @@ namespace Anthrax
 
             }
 
-			if (TARGET.Position.Distance3DFromPlayer > 10 && TARGET.Position.Distance3DFromPlayer < 30)
+			if (TARGET.Position.Distance3DFromPlayer > 10)
 			{
 				if (!TARGET.HasAuraById((int)Auras.FrostFever) && AI.Controllers.Spell.CanCast((int)Spells.Outbreak) || !TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.Outbreak))
 				{
@@ -332,8 +331,7 @@ namespace Anthrax
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FrostStrike);
                     return;
                 }
-            if (TARGET.Position.Distance3DFromPlayer > 10 && TARGET.Position.Distance3DFromPlayer < 30)
-            {
+            
 				//Pillar Of Frost
 				if (!ME.HasAuraById((int)Auras.PoF) && AI.Controllers.Spell.CanCast((int)Spells.PoF))
 				{
@@ -402,7 +400,6 @@ namespace Anthrax
 			}
                 
 
-            }
             else
             {
                 // Death Coil
@@ -529,7 +526,7 @@ namespace Anthrax
             // We always want to face the target
             //WoW.Internals.Movements.Face(unit.Position);
 
-			if (TARGET.Position.Distance3DFromPlayer > 10 && TARGET.Position.Distance3DFromPlayer < 30
+			if (TARGET.Position.Distance3DFromPlayer > 10
 			&& ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) > 1 
 			&& ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Frost) > 1)
 			{
@@ -541,17 +538,17 @@ namespace Anthrax
 			}
 			
 			
-            if (TARGET.Position.Distance3DFromPlayer > 10 && TARGET.Position.Distance3DFromPlayer < 30)
-            {
 
                 // Deseases
 				
-				if (ME.HasAuraById((int)Auras.CS))
+				if (ME.HasAuraById((int)Auras.CS) && TARGET.Position.Distance3DFromPlayer <= 15)
 				{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodBoil);
                     return;
 				}
-
+				
+				if (TARGET.Position.Distance3DFromPlayer <= 15)
+				{
                 if ((TARGET.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft < 8000).Any() ||
                    TARGET.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft < 8000).Any()) &&
                     AI.Controllers.Spell.CanCast((int)Spells.BloodBoil)
@@ -570,7 +567,7 @@ namespace Anthrax
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodBoil);
                     return;
                 }
-				
+				}
 				if (!ME.HasAuraById((int)Auras.BloodShield) && TARGET.HasAuraById((int)Auras.BloodPlague) 
 				|| (ME.HasAuraById((int)Auras.BloodShield) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodShield && x.TimeLeft <= 6000).Any()))
 				{
@@ -629,7 +626,7 @@ namespace Anthrax
                     return;
                 }
 
-            }
+            
             else
             {
                 // Death Coil
@@ -669,7 +666,7 @@ namespace Anthrax
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PoF);
 				}
 			
-			if (TARGET.Position.Distance3DFromPlayer > 10 && TARGET.Position.Distance3DFromPlayer < 30 && AI.Controllers.Spell.CanCast((int)Spells.UnholyBlight))
+			if (TARGET.Position.Distance3DFromPlayer < 15 && AI.Controllers.Spell.CanCast((int)Spells.UnholyBlight))
 				{
 					WoW.Internals.ActionBar.ExecuteSpell((int)Spells.UnholyBlight);
 					return;
