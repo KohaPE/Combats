@@ -62,6 +62,12 @@ namespace Anthrax
             Regrowth = 8936,
             Swiftmend = 18562,
             Tranquility = 740,
+			WildGrowth = 48438,
+			Nourish = 50464,
+			Rebirth = 20484,
+			Lifebloom = 33763,
+			WildMushroom = 145205,
+			IncarnationTree = 33891,
             NaturesVigil = 124974,
             Barkskin = 22812,
             CenarionWard = 102351,
@@ -112,6 +118,7 @@ namespace Anthrax
 			PredSwiftness = 69369,
 			Thrash = 106830,
 			ThrashFeralBear = 77758,
+			Lacerate = 33745,
 			FearlBearForm = 17057,
 			CatForm = 3025,
 			Prowl = 5215,
@@ -132,6 +139,10 @@ namespace Anthrax
 			TankCheck = 106734,
 			FeralCheck = 106733,
 			CC = 135700,
+			CCResto = 16870,
+			RestoCheck = 106735,
+			Lifebloom = 33763,
+			Harmony = 100977,
 }
 #endregion
 
@@ -243,7 +254,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	{
 	//Healing & Survival
 	{
-	if (ME.HealthPercent < CCSettings.FrenzyRegen && AI.Controllers.Spell.CanCast((int)Spells.FrenzyRegen))
+	if (ME.HealthPercent < CCSettings.FrenzyRegen && AI.Controllers.Spell.CanCast((int)Spells.FrenzyRegen) && MyRage >= 20)
 			{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FrenzyRegen);
 				return;
@@ -254,12 +265,9 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Barkskin);
 				return;
 			}
-	if (MyRage >= 60 && AI.Controllers.Spell.CanCast((int)Spells.SavageD) && !ME.HasAuraById((int)Auras.SavageD))
-			{
-				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageD);
-				return;
-			}
-	if (ME.HasAuraById((int)Auras.DoC))
+
+	if (ME.HasAuraById((int)Auras.DoC) && ME.HealthPercent < CCSettings.HealingTouch && AI.Controllers.Spell.CanCast((int)Spells.HealingTouch)
+		|| ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.TimeLeft <= 5000).Any() && AI.Controllers.Spell.CanCast((int)Spells.HealingTouch))
 			{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HealingTouch);
 				return;
@@ -271,15 +279,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 				return;
 			}
 			
-		if (TARGET.Position.Distance3DFromPlayer < 8)
-		{
-		//Mangle!!!
-			if (AI.Controllers.Spell.CanCast((int)Spells.MangleBear))
-			{
-				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.MangleBear);
-				return;
-			}
-		//Maul With Procs
+				//Maul With Procs
 			if (AI.Controllers.Spell.CanCast((int)Spells.Maul))
 			{
 			if (ObjectManager.LocalPlayer.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.Rage) >= 90 || ME.HasAuraById((int)Auras.TAC) && ME.HasAuraById((int)Auras.SavageD))
@@ -288,9 +288,30 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 				return;
 			}
 			}
+		
+		//Mangle!!!
+			if (AI.Controllers.Spell.CanCast((int)Spells.MangleBear))
+			{
+				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.MangleBear);
+				return;
+			}
+			
+		// Keep Lacerate Debuff on so it doesnt drop off
+			if (AI.Controllers.Spell.CanCast((int)Spells.Lacerate) && !TARGET.HasAuraById((int)Auras.Lacerate) 
+			|| AI.Controllers.Spell.CanCast((int)Spells.Lacerate) && TARGET.Auras.Where(x => x.SpellId == (int)Auras.Lacerate && x.TimeLeft <= 4000).Any() )
+			{
+				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Lacerate);
+				return;
+			}		
+		
+			if (MyRage >= 60 && AI.Controllers.Spell.CanCast((int)Spells.SavageD) && !ME.HasAuraById((int)Auras.SavageD))
+			{
+				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageD);
+				return;
+			}
 			
 		//Thrash Debuff
-			if (AI.Controllers.Spell.CanCast((int)Spells.Thrash))
+			if (AI.Controllers.Spell.CanCast((int)Spells.Thrash) && TARGET.Position.Distance3DFromPlayer < 8)
 			{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Thrash);
 				return;
@@ -311,7 +332,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 
 
 
-		}	
+			
 		}
     }
 	
@@ -489,39 +510,61 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
  //               Logger.WriteLine("Enter stealth ...");
  //               WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Prowl);
  //           }
-			
+
+ 
+ //New Combat simcraft 5.4.8
+ 
+ //Keep Rip From Falling Off
+ //if rip timeleft Less then 3 secs and target's health is below 25%
+ 	if (TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft < 3000).Any() && AI.Controllers.Spell.CanCast((int)Spells.FeroBite) && TARGET.HealthPercent <= 25)
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FeroBite);
+                    return;
+			}
+ 
+//Proc Dearm of Cenarious @ 4+ Combo Points or when Preadatory Swiftness is about to expire.
+
+ 		if (ME.HasAuraById((int)Auras.PredSwiftness) && AI.Controllers.Spell.CanCast((int)Spells.HealingTouch))
+		{
+		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HealingTouch);
+		}
+ 
+//Savage Roar if buff less then 3secs and Dosent Exist
+ 
 	if (ME.HasAuraById((int)Auras.GlyphofS) && !ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar))
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageRoar);
                     return;
             }
 			
-	if (ME.HasAuraById((int)Auras.PredSwiftness) && AI.Controllers.Spell.CanCast((int)Spells.HealingTouch))
-			{
-                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HealingTouch);
-                    return;
-            }
-			
+		
 	if (TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft > 6000).Any() && AI.Controllers.Spell.CanCast((int)Spells.FeroBite) && ME.ComboPoints > 4
-	|| TARGET.HealthPercent < 25 && ME.ComboPoints > 4 && TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.FeroBite))
+	|| TARGET.HealthPercent < 25 && ME.ComboPoints >= 4 && TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.FeroBite))
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FeroBite);
                     return;
         }
 		
 		
-	if (!TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.Rip) && ME.ComboPoints > 4
-	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft < 3000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rip) && ME.ComboPoints > 4 && AI.Controllers.Spell.CanCast((int)Spells.Rip)
-	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount <= 2).Any() && ME.ComboPoints > 4 && AI.Controllers.Spell.CanCast((int)Spells.Rip)
-	)
+ //overwire rip during Execute Range
+ 
+ 	if (!TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.Rip) && ME.ComboPoints >= 5
+	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft <= 6000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rip) && ME.ComboPoints >= 4 && AI.Controllers.Spell.CanCast((int)Spells.Rip)
+	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount <= 2).Any() && ME.ComboPoints >= 4 && AI.Controllers.Spell.CanCast((int)Spells.Rip))
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rip);
                     return;
         }
 	
+ //Thrash with Omen of Clarity
+		if (!TARGET.HasAuraById((int)Auras.Thrash) && AI.Controllers.Spell.CanCast((int)Spells.ThrashFeral) && ME.HasAuraById((int)Auras.CC))
+		{
+		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ThrashFeral);
+		}
+	
 	if (!TARGET.HasAuraById((int)Auras.Rake) && AI.Controllers.Spell.CanCast((int)Spells.Rake) && ME.ComboPoints <= 4
 	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rake && x.TimeLeft < 4000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rake)
-	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount >= 2).Any() && ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.Rake))
+	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount <= 2).Any() && ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.Rake))
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rake);
                     return;
@@ -532,10 +575,13 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ThrashFeral);
 		}
 	
-	if (MyEnergy <= 30 && AI.Controllers.Spell.CanCast((int)Spells.TigerFury))
+	
+ //Tigers Fury if Less then or equal to 35 energy
+ 		if (!ME.HasAuraById((int)Auras.CC) && AI.Controllers.Spell.CanCast((int)Spells.TigerFury) && MyEnergy <= 35)
 		{
 		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.TigerFury);
 		}
+		
 		
 	if (!TARGET.HasAuraById((int)Auras.FF) && AI.Controllers.Spell.CanCast((int)Spells.FF))
 		{
@@ -551,6 +597,62 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	
 	}
 	
+	
+		////////////////////////////////////////////////////////////////RESTO/////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	if (ME.HasAuraById((int)Auras.RestoCheck))
+	{
+	if (!ME.IsCasting)
+	{
+	//Lifebloom Code
+	if (TARGET.HealthPercent <= CCSettings.Lifebloom && TARGET.Auras.Where(x => x.SpellId == (int)Auras.Lifebloom && x.StackCount < 3).Any() && AI.Controllers.Spell.CanCast((int)Spells.Lifebloom)
+	|| TARGET.HealthPercent <= CCSettings.Lifebloom && !TARGET.HasAuraById((int)Auras.Lifebloom) && AI.Controllers.Spell.CanCast((int)Spells.Lifebloom)
+	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Lifebloom && x.TimeLeft <= 4000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Lifebloom))
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Lifebloom);
+                    return;
+        }
+	// innervate
+		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Mana) <= 80 && AI.Controllers.Spell.CanCast((int)Spells.Innervate))
+			{
+				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Innervate);
+				return;
+			}
+	//Wild Growth
+	if (TARGET.HealthPercent <= CCSettings.WildGrowth && AI.Controllers.Spell.CanCast((int)Spells.WildGrowth))
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.WildGrowth);
+                    return;
+        }
+	
+	//Regrowth with proc	
+		if (TARGET.HealthPercent <= 50 && AI.Controllers.Spell.CanCast((int)Spells.Regrowth) && !TARGET.HasAuraById((int)Auras.Regrowth)
+		|| ME.HasAuraById((int)Auras.CCResto) && AI.Controllers.Spell.CanCast((int)Spells.Regrowth) && !TARGET.HasAuraById((int)Auras.Regrowth))
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Regrowth);
+                    return;
+        }
+	//rejuvenation	
+	if (TARGET.HealthPercent <= CCSettings.Rejuvenation && AI.Controllers.Spell.CanCast((int)Spells.Rejuvenation) && !TARGET.HasAuraById((int)Auras.Rejuvenation))
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rejuvenation);
+                    return;
+        }
+	//Wild Mushroom
+	if (TARGET.HealthPercent <= CCSettings.WildMushroom && AI.Controllers.Spell.CanCast((int)Spells.WildMushroom))
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.WildMushroom);
+                    return;
+        }
+	
+	//Wrath	
+	if (AI.Controllers.Spell.CanCast((int)Spells.Wrath))
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Wrath);
+                    return;
+        }
+	}
+	}
 
 //////////////////////////////////////////////////////////////////////3	
 }////////////////////////End Single Target Rotation///////////////////
@@ -948,13 +1050,104 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                 return CCSettings;
             }
         }
+	//Complex Healing Code
+
+//	public bool	NeedsHeals()
+//	{
+	
+//	}
+		
+		
 		[Serializable]
     public class Settings
     {
         public int FrenzyRegen = 80;
         public int Barkskin = 70;
 		public int Enrage = 30;
+		public int Rejuvenation = 90;
+		public int HealingTouch = 90;
+		public int Swiftmend = 80;
+		public int WildGrowth = 96;
+		public int Lifebloom = 99;
+		public int WildMushroom = 99;
+		
+	//Healing Settings
+		[XmlIgnore]
+        [CategoryAttribute("Restoration Settings"),
+        DisplayName("Wild Mushroom Hp Limit"), DefaultValueAttribute(99)]
+        public int _WildMushroom
+        {
+            get
+            {
+                return WildMushroom;
+            }
+            set
+            {
+                WildMushroom = value;
+            }
+        }
 
+	
+		[XmlIgnore]
+        [CategoryAttribute("Restoration Settings"),
+        DisplayName("Lifebloom Hp Limit"), DefaultValueAttribute(99)]
+        public int _Lifebloom
+        {
+            get
+            {
+                return Lifebloom;
+            }
+            set
+            {
+                Lifebloom = value;
+            }
+        }
+		
+		[XmlIgnore]
+        [CategoryAttribute("Restoration Settings"),
+        DisplayName("Wild Growth Hp Limit"), DefaultValueAttribute(90)]
+        public int _WildGrowth
+        {
+            get
+            {
+                return WildGrowth;
+            }
+            set
+            {
+                WildGrowth = value;
+            }
+        }
+		
+		[XmlIgnore]
+        [CategoryAttribute("Restoration Settings"),
+        DisplayName("Swift Mend Hp Limit"), DefaultValueAttribute(80)]
+        public int _Swiftmend
+        {
+            get
+            {
+                return Swiftmend;
+            }
+            set
+            {
+                Swiftmend = value;
+            }
+        }	
+
+		[XmlIgnore]
+        [CategoryAttribute("Restoration Settings"),
+        DisplayName("Rejuvenation Hp Limit"), DefaultValueAttribute(90)]
+        public int _Rejuvenation
+        {
+            get
+            {
+                return Rejuvenation;
+            }
+            set
+            {
+                Rejuvenation = value;
+            }
+        }
+		//Tank Settings
         [XmlIgnore]
         [CategoryAttribute("Tank Settings"),
         DisplayName("Frenzy Regen?"), DefaultValueAttribute(90)]
@@ -967,6 +1160,20 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
             set
             {
                 FrenzyRegen = value;
+            }
+        }
+		[XmlIgnore]
+        [CategoryAttribute("Tank Settings"),
+        DisplayName("Healing Touch Limit"), DefaultValueAttribute(90)]
+        public int _HealingTouch
+        {
+            get
+            {
+                return HealingTouch;
+            }
+            set
+            {
+                HealingTouch = value;
             }
         }
 		[XmlIgnore]
