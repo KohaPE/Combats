@@ -93,6 +93,7 @@ namespace Anthrax
 			RM = 119611,
 			MM = 139597,
 			GlyphofMT = 123763,
+			SynapseS = 96228,
 }
 #endregion
 
@@ -120,8 +121,11 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		var MyEnergy = ObjectManager.LocalPlayer.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.Energy);
 		var IsCasting = ObjectManager.LocalPlayer.IsCasting;
 
+
+		
 	if (TARGET.Health >= 1 && ME.InCombat)
 	{
+	
 	
 	////////////////////////////////////////////////////Brewmaster///////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////
@@ -574,7 +578,11 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
             }
         }
         #endregion
-
+		
+		
+		
+		
+		
         public override void OnCombat(WowUnit TARGET)
         {
             /* Performance tests
