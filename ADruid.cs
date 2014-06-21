@@ -163,11 +163,16 @@ public override void OnPull(WoW.Classes.ObjectManager.WowUnit unit)
 //public override void OnCombat(WoW.Classes.ObjectManager.WowUnit unit)
 //{
 //}
+
+private int lastSDTick = 0;
+
 private void castNextSpellbySinglePriority(WowUnit TARGET)
 {
 
 		var MyRage = ObjectManager.LocalPlayer.GetPower(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Rage);
 		var MyEnergy = ObjectManager.LocalPlayer.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.Energy);
+		
+
 		
 	if (TARGET.Health >= 1 && ME.InCombat)
 	{
@@ -279,15 +284,22 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 				return;
 			}
 			
-				//Maul With Procs
-			if (AI.Controllers.Spell.CanCast((int)Spells.Maul))
+			if (MyRage >= 60 && AI.Controllers.Spell.CanCast((int)Spells.SavageD) && !ME.HasAuraById((int)Auras.SavageD) && Environment.TickCount - lastSDTick > 3000)
 			{
-			if (ObjectManager.LocalPlayer.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.Rage) >= 90 || ME.HasAuraById((int)Auras.TAC) && ME.HasAuraById((int)Auras.SavageD))
+				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageD);
+				lastSDTick = Environment.TickCount;
+				return;
+			}
+			
+				//Maul With Procs
+			if (MyRage > 90 && AI.Controllers.Spell.CanCast((int)Spells.Maul) || ME.HasAuraById((int)Auras.TAC) && AI.Controllers.Spell.CanCast((int)Spells.Maul) && ME.HasAuraById((int)Auras.SavageD))
 			{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Maul);
 				return;
 			}
-			}
+			
+			
+
 		
 		//Mangle!!!
 			if (AI.Controllers.Spell.CanCast((int)Spells.MangleBear))
@@ -304,11 +316,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 				return;
 			}		
 		
-			if (MyRage >= 60 && AI.Controllers.Spell.CanCast((int)Spells.SavageD) && !ME.HasAuraById((int)Auras.SavageD))
-			{
-				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageD);
-				return;
-			}
+
 			
 		//Thrash Debuff
 			if (AI.Controllers.Spell.CanCast((int)Spells.Thrash) && TARGET.Position.Distance3DFromPlayer < 8)
@@ -516,7 +524,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
  
  //Keep Rip From Falling Off
  //if rip timeleft Less then 3 secs and target's health is below 25%
- 	if (TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft < 3000).Any() && AI.Controllers.Spell.CanCast((int)Spells.FeroBite) && TARGET.HealthPercent <= 25)
+ 	if (TARGET.HasAuraById((int)Auras.Rip) && TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft < 5000).Any() && AI.Controllers.Spell.CanCast((int)Spells.FeroBite) && TARGET.HealthPercent <= 25)
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FeroBite);
                     return;
@@ -531,14 +539,15 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
  
 //Savage Roar if buff less then 3secs and Dosent Exist
  
-	if (ME.HasAuraById((int)Auras.GlyphofS) && !ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar))
+	if (ME.HasAuraById((int)Auras.GlyphofS) && !ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && ME.ComboPoints < 3 
+	|| !ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && ME.ComboPoints < 3)
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageRoar);
                     return;
             }
 			
 		
-	if (TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft > 6000).Any() && AI.Controllers.Spell.CanCast((int)Spells.FeroBite) && ME.ComboPoints > 4
+	if (TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft > 10000).Any() && AI.Controllers.Spell.CanCast((int)Spells.FeroBite) && ME.ComboPoints > 4
 	|| TARGET.HealthPercent < 25 && ME.ComboPoints >= 4 && TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.FeroBite))
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FeroBite);
@@ -550,7 +559,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
  
  	if (!TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.Rip) && ME.ComboPoints >= 5
 	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft <= 6000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rip) && ME.ComboPoints >= 4 && AI.Controllers.Spell.CanCast((int)Spells.Rip)
-	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount <= 2).Any() && ME.ComboPoints >= 4 && AI.Controllers.Spell.CanCast((int)Spells.Rip))
+	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount <= 1).Any() && ME.ComboPoints >= 4 && AI.Controllers.Spell.CanCast((int)Spells.Rip))
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rip);
                     return;
@@ -562,8 +571,8 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ThrashFeral);
 		}
 	
-	if (!TARGET.HasAuraById((int)Auras.Rake) && AI.Controllers.Spell.CanCast((int)Spells.Rake) && ME.ComboPoints <= 4
-	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rake && x.TimeLeft < 4000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rake)
+	if (!TARGET.HasAuraById((int)Auras.Rake) && AI.Controllers.Spell.CanCast((int)Spells.Rake) && ME.ComboPoints < 4
+	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rake && x.TimeLeft < 5000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rake)
 	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount <= 2).Any() && ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.Rake))
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rake);
@@ -583,10 +592,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		}
 		
 		
-	if (!TARGET.HasAuraById((int)Auras.FF) && AI.Controllers.Spell.CanCast((int)Spells.FF))
-		{
-		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FF);
-		}
+
 		
 		
 	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.MangleFeral))
