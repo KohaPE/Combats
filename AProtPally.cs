@@ -40,12 +40,13 @@ namespace Anthrax
 
         public override string Name
         {
-            get { return "A Prot Pally by Koha"; }                      //This is the name displayed in SPQR's Class selection DropdownList
+            get { return "A Paladin by Koha"; }                      //This is the name displayed in SPQR's Class selection DropdownList
         }
 
         #region enums
         internal enum Spells : int                      //This is a convenient list of all spells used by our combat routine
         {		//you can have search on wowhead.com for spell name, and get the id in url
+		//Prot Spec Spells
 		AS = 31935,
 		Con = 26573,
 		CS = 35395,
@@ -60,6 +61,18 @@ namespace Anthrax
 		SealT = 31801,
 		SealI = 20165,
 		HolyP = 114165,
+		//Holy Spec Spells
+		HolyRad = 82327,
+		HolyShock = 20473,
+		LoD = 85222,
+		HolyL = 635,
+		FoL = 19750,
+		LHammer = 114158,
+		DivineF = 31842,
+		Beacon = 53563,
+		DivineL = 82326,
+		
+		
         }
 
         internal enum Auras : int                       //This is another convenient list of Auras used in our combat routine
@@ -69,6 +82,9 @@ namespace Anthrax
 		SealI = 20165,
 		SealT = 31801,
 		EFlame = 114163,
+		GC = 85043,
+		HolyCheck = 76669,
+		Beacon = 53651,
 }
 
 
@@ -98,10 +114,17 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 
 	var HolyPower = ObjectManager.LocalPlayer.GetPower(WoW.Classes.ObjectManager.WowUnit.WowPowerType.HolyPower);
 	var IsCasting = ObjectManager.LocalPlayer.IsCasting;
+	
+if (!ME.HasAuraById((int)Auras.SealI) && AI.Controllers.Spell.CanCast((int)Spells.SealI))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SealI);
+                return;
+            }
+			
 
 if (TARGET.Health >= 1 && ME.InCombat)
 { //Combat Check
-												///////////////////////////Survival////////////////////////
+												///////////////////////////Protection////////////////////////
 if (ME.HasAuraById((int)Auras.ProtCheck))
 { //Spec Check
 
@@ -118,6 +141,12 @@ if (ME.HasAuraById((int)Auras.ProtCheck))
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SealI);
                 return;
             }
+			
+		if (!ME.HasAuraById((int)Auras.GC) && AI.Controllers.Spell.CanCast((int)Spells.AS))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.AS);
+                return;
+            }		
 			
 		if (HolyPower >= 4 && AI.Controllers.Spell.CanCast((int)Spells.SoR) && ME.HasAuraById((int)Auras.EFlame))
 		    {
@@ -167,6 +196,67 @@ if (ME.HasAuraById((int)Auras.ProtCheck))
             }
 	
 } //End of Spec Check
+
+//////////////////////////////////////////////////////////Holy/////////////////////////////////////////////
+
+if (ME.HasAuraById((int)Auras.HolyCheck))
+{
+	//Mouseover Light's Hammer while Pressing Alt
+	if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.LHammer)
+                         && !IsCasting)
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.LHammer);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
+			
+	//////Holy Power Spending
+	if (AI.Controllers.Spell.CanCast((int)Spells.HolyShock) && TARGET.HealthPercent <= 99)
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HolyShock);
+                return;
+            }
+	//Eternal Flame
+	if (AI.Controllers.Spell.CanCast((int)Spells.EFlame) && TARGET.HealthPercent <= 90)
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.EFlame);
+                return;
+            }
+			
+	//DivineLight
+	if (AI.Controllers.Spell.CanCast((int)Spells.DivineL) && TARGET.HealthPercent <= 60)
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DivineL);
+                return;
+            }
+			
+	//Holy Light
+	if (AI.Controllers.Spell.CanCast((int)Spells.HolyL) && TARGET.HealthPercent <= 95)
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HolyL);
+                return;
+            }
+			
+				//Flash of Light
+	if (AI.Controllers.Spell.CanCast((int)Spells.FoL) && TARGET.HealthPercent <= 55)
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FoL);
+                return;
+            }
+                
+} // End of Spec Check
+
+
+
 } //Combat Check
 } //End AoE Code
 #endregion
@@ -179,7 +269,7 @@ if (ME.HasAuraById((int)Auras.ProtCheck))
 		
 	if (TARGET.Health >= 1 && ME.InCombat)
 { //Combat Check
-													///////////////////////////Survival////////////////////////
+													///////////////////////////Protection AoE////////////////////////
 if (ME.HasAuraById((int)Auras.ProtCheck))
 { //Spec Check
 		if (!ME.HasAuraById((int)Auras.RF) && AI.Controllers.Spell.CanCast((int)Spells.RF))
@@ -199,18 +289,25 @@ if (ME.HasAuraById((int)Auras.ProtCheck))
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SoR);
                 return;
             }
-		if (HolyPower >= 3 && AI.Controllers.Spell.CanCast((int)Spells.EFlame) && !ME.HasAuraById((int)Auras.EFlame))
+		if (HolyPower >= 3 && AI.Controllers.Spell.CanCast((int)Spells.EFlame) && !ME.HasAuraById((int)Auras.EFlame) || ME.HealthPercent < 60 && HolyPower >= 3 && AI.Controllers.Spell.CanCast((int)Spells.EFlame))
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.EFlame);
                 return;
             }
+			
+		if (!ME.HasAuraById((int)Auras.GC) && AI.Controllers.Spell.CanCast((int)Spells.AS))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.AS);
+                return;
+            }	
 		
 		if (HolyPower < 5 && AI.Controllers.Spell.CanCast((int)Spells.HoR))
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HoR);
                 return;
             }
-		if (AI.Controllers.Spell.CanCast((int)Spells.Con))
+			
+		if (AI.Controllers.Spell.CanCast((int)Spells.Con) && TARGET.Position.Distance3DFromPlayer < 8)
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Con);
                 return;
@@ -248,11 +345,6 @@ if (ME.HasAuraById((int)Auras.ProtCheck))
 	
 } //End of Spec Check
 	
-	
-	
-	
-	
-	
 } //Combat Check
 } //End AoE Code
 #endregion
@@ -276,6 +368,23 @@ if (ME.HasAuraById((int)Auras.ProtCheck))
             }
         }
         #endregion
+	
+
+    public class DetectKeyPress
+    {
+        public static int Shift = 0x10;
+        public static int Ctrl = 0x11;
+        public static int Alt = 0x12;
+
+        public static int Z = 0x5A;
+        public static int X = 0x58;
+        public static int C = 0x43;
+ 
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        internal static extern short GetKeyState(int virtualKeyCode);
+
+    }
+
 
         public override void OnCombat(WowUnit TARGET)
         {
@@ -293,6 +402,8 @@ if (ME.HasAuraById((int)Auras.ProtCheck))
             {
                 changeRotation();
             }
+			
+		
         }
 
         public override void OnLoad()   //This is called when the Customclass is loaded in SPQR

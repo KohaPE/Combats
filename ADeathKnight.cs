@@ -186,13 +186,12 @@ namespace Anthrax
 
                 // Deseases
 				
-				if (ME.HasAuraById((int)Auras.CS) && TARGET.Position.Distance3DFromPlayer <= 15)
+				if (ME.HasAuraById((int)Auras.CS) && TARGET.Position.Distance3DFromPlayer < 10)
 				{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodBoil);
                     return;
 				}
-				if (TARGET.Position.Distance3DFromPlayer <= 15)
-				{
+				
                 if ((TARGET.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft < 8000).Any() ||
                    TARGET.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft < 8000).Any()) &&
                     AI.Controllers.Spell.CanCast((int)Spells.BloodBoil)
@@ -201,8 +200,8 @@ namespace Anthrax
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodBoil);
                     return;
                 }
-				}
-								// Heart Strike
+				
+				// Heart Strike
                 if (AI.Controllers.Spell.CanCast((int)Spells.HS) && ME.HasAuraById((int)Auras.BloodShield) 
 				&& ME.Auras.Where(x => x.SpellId == (int)Auras.BloodShield && x.TimeLeft >= 6).Any() 
 				&&  ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Death) >= 1
@@ -212,8 +211,8 @@ namespace Anthrax
                     return;
                 }
 				
-				if (!ME.HasAuraById((int)Auras.BloodShield) && TARGET.HasAuraById((int)Auras.BloodPlague) 
-				|| (ME.HasAuraById((int)Auras.BloodShield) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodShield && x.TimeLeft <= 6000).Any()))
+				if (!ME.HasAuraById((int)Auras.BloodShield) && TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.DeathStrike) 
+				|| (ME.HasAuraById((int)Auras.BloodShield) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodShield && x.TimeLeft <= 6000).Any() && AI.Controllers.Spell.CanCast((int)Spells.DeathStrike)))
 				{
 					WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DeathStrike);
 					return;
@@ -238,11 +237,11 @@ namespace Anthrax
                 }
                                 
                 // Death Strike
-                if (AI.Controllers.Spell.CanCast((int)Spells.DeathStrike))
-                {
-                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DeathStrike);
-                    return;
-                }
+               // if (AI.Controllers.Spell.CanCast((int)Spells.DeathStrike))
+               // {
+               //     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DeathStrike);
+              //      return;
+              //  }
 
 
                 // Soul Reaper
@@ -261,7 +260,7 @@ namespace Anthrax
             }
                 
 			                // Rune Strike
-                if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 30 &&
+                if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) > 30 &&
                     AI.Controllers.Spell.CanCast((int)Spells.RuneStrike))
                 {
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.RuneStrike);

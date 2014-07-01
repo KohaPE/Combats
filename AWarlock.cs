@@ -134,6 +134,7 @@ private int lastConflagTick = 0;
 private int lastConFandBTick = 0;
 private int lastChaosBoltTick = 0;
 private int lastFandBTick = 0;
+private int lastIncTick = 0;
 
 private void castNextSpellbySinglePriority(WowUnit TARGET)
 {
@@ -175,14 +176,23 @@ if (ME.HasAuraById((int)Auras.DestroCheck) && !IsCasting)
             WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HealthFunnel);
             return;
         }	
+		
+		
+		//Fireand Brim
+	if (ME.HasAuraById((int)Auras.FandBrim) && Environment.TickCount - lastFandBTick > 2000)
+	        {
+			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FandBrim);
+			lastFandBTick = Environment.TickCount;
+			return;
+        }	
 
 		//ExecutePhase
-	if (Embers > 35 && TARGET.HealthPercent < 20 || TARGET.HealthPercent < 20 && Embers < 10)
+	if (Embers > 35 && TARGET.HealthPercent < 20 || TARGET.Health <= 100000 && Embers >= 10)
 		{
             WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ShadowBurn);
             return;
         }
-
+	
 	//Immolate
 	if (!TARGET.HasAuraById((int)Auras.Immolate) && Environment.TickCount - lastImmolateTick > 4000 
 	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Immolate && x.TimeLeft <= 4000).Any() && Environment.TickCount - lastImmolateTick > 2000)
@@ -190,6 +200,14 @@ if (ME.HasAuraById((int)Auras.DestroCheck) && !IsCasting)
 			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Immolate);
 			lastImmolateTick = Environment.TickCount;
 			return;
+        }	
+		
+		//ChaosBolt
+	if (Embers > 35 && AI.Controllers.Spell.CanCast((int)Spells.ChaosBolt) && Environment.TickCount - lastChaosBoltTick > 4000)
+		{
+            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ChaosBolt);
+			lastChaosBoltTick = Environment.TickCount;
+            return;
         }	
 	
 	//conflag on 2 Charges
@@ -200,16 +218,10 @@ if (ME.HasAuraById((int)Auras.DestroCheck) && !IsCasting)
 			return;
         }
 	
-	//ChaosBolt
-	if (Embers > 35 && AI.Controllers.Spell.CanCast((int)Spells.ChaosBolt) && Environment.TickCount - lastChaosBoltTick > 4000)
-		{
-            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ChaosBolt);
-			lastChaosBoltTick = Environment.TickCount;
-            return;
-        }	
+
 	
 	//Incinerate
-	if (AI.Controllers.Spell.CanCast((int)Spells.Incinerate))
+	if (AI.Controllers.Spell.CanCast((int)Spells.Incinerate) && Environment.TickCount - lastIncTick > 8000)
 		{
             WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Incinerate);
             return;

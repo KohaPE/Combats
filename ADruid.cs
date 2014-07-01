@@ -101,6 +101,9 @@ namespace Anthrax
 			FoN = 33831,
 			Hurricane = 106996,
 			AstralStorm = 16914,
+			MotW = 1126,
+			CWard = 102351,
+			Berserk = 106951,
         }
 
         internal enum Auras : int                       //This is another convenient list of Auras used in our combat routine
@@ -143,11 +146,20 @@ namespace Anthrax
 			RestoCheck = 106735,
 			Lifebloom = 33763,
 			Harmony = 100977,
+			FForm = 40120,
+			MotW = 1126,
+			CWardtallent = 102351,
+			CWard = 102352,
+			Berserk = 106951,
+			TigerFury = 5217,
+			NaturesVigil = 124974,
+			GlyphofShred = 114235,
 }
 #endregion
 
 public override void OnPatrol()
     {
+	
 
     }
 
@@ -164,6 +176,7 @@ public override void OnPull(WoW.Classes.ObjectManager.WowUnit unit)
 //{
 //}
 
+private int lastStealthTick = 0;
 private int lastSDTick = 0;
 
 private void castNextSpellbySinglePriority(WowUnit TARGET)
@@ -172,7 +185,20 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		var MyRage = ObjectManager.LocalPlayer.GetPower(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Rage);
 		var MyEnergy = ObjectManager.LocalPlayer.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.Energy);
 		
+	 if (!ME.InCombat && !ME.HasAuraById((int)Auras.Prowl) && Environment.TickCount - lastStealthTick > 2000 && ME.HasAuraById((int)Auras.FeralCheck) && !ObjectManager.LocalPlayer.IsMounted && !ME.HasAuraById((int)Auras.FForm))
+         {
+			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Prowl);
+			lastStealthTick = Environment.TickCount;
+			return;
+        }
+		
+	if (ME.HasAuraById((int)Auras.Prowl) && TARGET.Position.Distance3DFromPlayer < 5)
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Pounce);
+                    return;
+            }	
 
+		
 		
 	if (TARGET.Health >= 1 && ME.InCombat)
 	{
@@ -259,6 +285,12 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	{
 	//Healing & Survival
 	{
+		if (ME.HealthPercent < CCSettings.CWard && AI.Controllers.Spell.CanCast((int)Spells.CWard) && !ME.HasAuraById((int)Auras.CWard))
+			{
+				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.CWard);
+				return;
+			}
+	
 	if (ME.HealthPercent < CCSettings.FrenzyRegen && AI.Controllers.Spell.CanCast((int)Spells.FrenzyRegen) && MyRage >= 20)
 			{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FrenzyRegen);
@@ -522,6 +554,31 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
  
  //New Combat simcraft 5.4.8
  
+
+		
+	if (ME.HasAuraById((int)Auras.Prowl))
+	{
+	if (AI.Controllers.Spell.CanCast((int)Spells.Pounce))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Pounce);
+                    return;
+			}	
+	}
+	
+//Boss Cooldowns Auto.
+
+	if(ObjectManager.Target.CreatureCache.Classification == WoW.Classes.WowCreatureCache.WowUnitClassification.WorldBoss && TARGET.Position.Distance3DFromPlayer < 8 && !ME.HasAuraById((int)Auras.TigerFury) && AI.Controllers.Spell.CanCast((int)Spells.Berserk))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Berserk);
+                    return;
+			}
+			
+	if(ObjectManager.Target.CreatureCache.Classification == WoW.Classes.WowCreatureCache.WowUnitClassification.WorldBoss && TARGET.Position.Distance3DFromPlayer < 8 && AI.Controllers.Spell.CanCast((int)Spells.NaturesVigil))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.NaturesVigil);
+                    return;
+			}
+			
  //Keep Rip From Falling Off
  //if rip timeleft Less then 3 secs and target's health is below 25%
  	if (TARGET.HasAuraById((int)Auras.Rip) && TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft < 5000).Any() && AI.Controllers.Spell.CanCast((int)Spells.FeroBite) && TARGET.HealthPercent <= 25)
@@ -566,7 +623,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
         }
 	
  //Thrash with Omen of Clarity
-		if (!TARGET.HasAuraById((int)Auras.Thrash) && AI.Controllers.Spell.CanCast((int)Spells.ThrashFeral) && ME.HasAuraById((int)Auras.CC))
+		if (!TARGET.HasAuraById((int)Auras.Thrash) && AI.Controllers.Spell.CanCast((int)Spells.ThrashFeral) && ME.HasAuraById((int)Auras.CC) && TARGET.Position.Distance3DFromPlayer < 8)
 		{
 		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ThrashFeral);
 		}
@@ -583,18 +640,16 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		{
 		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ThrashFeral);
 		}
-	
+
 	
  //Tigers Fury if Less then or equal to 35 energy
- 		if (!ME.HasAuraById((int)Auras.CC) && AI.Controllers.Spell.CanCast((int)Spells.TigerFury) && MyEnergy <= 35)
+ 		if (!ME.HasAuraById((int)Auras.CC) && AI.Controllers.Spell.CanCast((int)Spells.TigerFury) && MyEnergy <= 35 && !ME.HasAuraById((int)Auras.Berserk))
 		{
 		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.TigerFury);
 		}
 		
-		
-
-		
-		
+	
+	
 	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.MangleFeral))
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.MangleFeral);
@@ -621,6 +676,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	// innervate
 		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Mana) <= 80 && AI.Controllers.Spell.CanCast((int)Spells.Innervate))
 			{
+				Anthrax.WoW.Internals.Chat.SendMessage("/target Player");
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Innervate);
 				return;
 			}
@@ -907,6 +963,12 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                     return;
             }
 			
+		if (!ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && ME.ComboPoints > 1)
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageRoar);
+                    return;
+            }
+			
 	if (ME.HasAuraById((int)Auras.PredSwiftness) && AI.Controllers.Spell.CanCast((int)Spells.HealingTouch))
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HealingTouch);
@@ -914,7 +976,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
             }
 			
 	if (!TARGET.HasAuraById((int)Auras.Thrash) && AI.Controllers.Spell.CanCast((int)Spells.ThrashFeral)
-	|| ME.HasAuraById((int)Auras.DoC) && AI.Controllers.Spell.CanCast((int)Spells.ThrashFeral) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount >= 2).Any())
+	|| ME.HasAuraById((int)Auras.DoC) && AI.Controllers.Spell.CanCast((int)Spells.ThrashFeral) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount >= 4).Any())
 		{
 		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ThrashFeral);
 		}
@@ -925,7 +987,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		}
 	
 	
-	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.SwipeFeral) && MyEnergy > 50
+	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.SwipeFeral)
 	|| ME.HasAuraById((int)Auras.CC) && AI.Controllers.Spell.CanCast((int)Spells.SwipeFeral))
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SwipeFeral);
@@ -1070,6 +1132,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
         public int FrenzyRegen = 80;
         public int Barkskin = 70;
 		public int Enrage = 30;
+		public int CWard = 70;
 		public int Rejuvenation = 90;
 		public int HealingTouch = 90;
 		public int Swiftmend = 80;
@@ -1156,7 +1219,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		//Tank Settings
         [XmlIgnore]
         [CategoryAttribute("Tank Settings"),
-        DisplayName("Frenzy Regen?"), DefaultValueAttribute(90)]
+        DisplayName("Frenzy Regen?"), DefaultValueAttribute(60)]
         public int _FrenzyRegen
         {
             get
@@ -1182,6 +1245,22 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                 HealingTouch = value;
             }
         }
+		
+		[XmlIgnore]
+        [CategoryAttribute("Tank Settings"),
+        DisplayName("Cenarion Ward Hp Limit"), DefaultValueAttribute(85)]
+        public int _CWard
+        {
+            get
+            {
+                return CWard;
+            }
+            set
+            {
+                CWard = value;
+            }
+        }
+		
 		[XmlIgnore]
         [CategoryAttribute("Tank Settings"),
         DisplayName("Enrage Limit"), DefaultValueAttribute(30)]
@@ -1196,6 +1275,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                 Enrage = value;
             }
         }
+		//Survival Settings
        [XmlIgnore]
         [CategoryAttribute("Survival Settings"),
         DisplayName("Barkskin"), DefaultValueAttribute(80)]
