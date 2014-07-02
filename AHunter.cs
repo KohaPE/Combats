@@ -67,6 +67,7 @@ namespace Anthrax
 			Pet2 = 83242,
 			Pet3 = 83243,
 			RevivePet = 982,
+			Etrap = 82939,
         }
 
         internal enum Auras : int                       //This is another convenient list of Auras used in our combat routine
@@ -84,6 +85,8 @@ namespace Anthrax
 			Survival = 118976,
 			T162P = 144637,
 			SurvivalCheck = 118976,
+			BMCheck = 34954,
+			FocusFire = 82692,
 }
 
         public enum CallPetSpells : int
@@ -225,6 +228,103 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 
 if (TARGET.Health >= 1 && ME.InCombat)
 { //Combat Check
+
+												///////////////////////////Beast Master////////////////////
+if (ME.HasAuraById((int)Auras.BMCheck))
+{ //Spec Check		
+
+///Pet Controls
+
+            if (!WoW.Internals.ObjectManager.Pet.IsValid || 
+                WoW.Internals.ObjectManager.Pet.IsDead)
+            {
+                PleaseBringMyPetBack();
+            }
+		if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.Etrap)
+                         && !IsCasting)
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Etrap);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
+			
+	if (Pet.HealthPercent < 80 && !Pet.HasAuraById((int)Auras.MendPet) && AI.Controllers.Spell.CanCast((int)Spells.MendPet) && Pet.IsAlive)
+		{
+            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.MendPet);
+            return;
+        }
+		
+	if (ME.HasAuraById((int)Auras.T162P) && AI.Controllers.Spell.CanCast((int)Spells.RapidFire))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.RapidFire);
+                return;
+            }
+		
+				//Arcane Shot Capp
+		if(Focus >= 90 && AI.Controllers.Spell.CanCast((int)Spells.ArcaneShot))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ArcaneShot);
+                return;
+            }
+			//Serpent Sting
+		if(!TARGET.HasAuraById((int)Auras.SerpentSting) && AI.Controllers.Spell.CanCast((int)Spells.SerpentSting))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SerpentSting);
+                return;
+            }	
+			
+		//Focus Fire
+		if(!ME.HasAuraById((int)Auras.FocusFire) && AI.Controllers.Spell.CanCast((int)Spells.FocusFire) && ME.Auras.Where(x => x.SpellId == (int)Auras.Frenzy && x.StackCount >= 5).Any())
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FocusFire);
+                return;
+            }
+			
+		//KillShot
+		if(TARGET.HealthPercent < 20 && AI.Controllers.Spell.CanCast((int)Spells.KillShot))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.KillShot);
+                return;
+            }	
+			
+		//KillCommand
+		if(AI.Controllers.Spell.CanCast((int)Spells.KillCommand))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.KillCommand);
+                return;
+            }		
+			
+					//Glaive Toss
+		if(Focus >= 15 && AI.Controllers.Spell.CanCast((int)Spells.GlaiveToss))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.GlaiveToss);
+                return;
+            }	
+			
+		//Arcane Shot Capp
+		if(Focus > 60 && AI.Controllers.Spell.CanCast((int)Spells.ArcaneShot))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ArcaneShot);
+                return;
+            }
+			
+				//CobraShot
+		if(Focus <= 60 && AI.Controllers.Spell.CanCast((int)Spells.CobraShot))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.CobraShot);
+                return;
+            }
+
+}//Spec Check		
 												///////////////////////////Survival////////////////////////
 if (ME.HasAuraById((int)Auras.SurvivalCheck))
 { //Spec Check
@@ -237,7 +337,22 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
             {
                 PleaseBringMyPetBack();
             }
+		if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.Etrap)
+                         && !IsCasting)
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Etrap);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
 
+                    return;
+
+                }
 			
 	if (Pet.HealthPercent < 80 && !Pet.HasAuraById((int)Auras.MendPet) && AI.Controllers.Spell.CanCast((int)Spells.MendPet) && Pet.IsAlive)
 		{
@@ -326,6 +441,74 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
 		
 	if (TARGET.Health >= 1 && ME.InCombat)
 { //Combat Check
+
+													///////////////////////////Beast Master////////////////////////
+if (ME.HasAuraById((int)Auras.BMCheck))
+{ //Spec Check
+
+
+///Pet Controls
+
+            if (!WoW.Internals.ObjectManager.Pet.IsValid || 
+                WoW.Internals.ObjectManager.Pet.IsDead)
+            {
+                PleaseBringMyPetBack();
+            }
+
+				if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.Etrap)
+                         && !IsCasting)
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Etrap);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
+			
+	if (Pet.HealthPercent < 80 && !Pet.HasAuraById((int)Auras.MendPet) && AI.Controllers.Spell.CanCast((int)Spells.MendPet) && Pet.IsAlive)
+		{
+            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.MendPet);
+            return;
+        }
+			
+		if (ME.HasAuraById((int)Auras.T162P) && AI.Controllers.Spell.CanCast((int)Spells.RapidFire))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.RapidFire);
+                return;
+            }
+	
+		//MultiShot
+		if(AI.Controllers.Spell.CanCast((int)Spells.MultiShot))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.MultiShot);
+                return;
+            }
+		
+		//Glaive Toss
+		if(Focus >= 15 && AI.Controllers.Spell.CanCast((int)Spells.GlaiveToss))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.GlaiveToss);
+                return;
+            }
+
+			
+		//CobraShot
+		if(Focus <= 20 && AI.Controllers.Spell.CanCast((int)Spells.CobraShot))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.CobraShot);
+                return;
+            }		
+	
+
+	
+} //End of Spec Check
 													///////////////////////////Survival////////////////////////
 if (ME.HasAuraById((int)Auras.SurvivalCheck))
 { //Spec Check
@@ -338,7 +521,23 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
             {
                 PleaseBringMyPetBack();
             }
+		
+		if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.Etrap)
+                         && !IsCasting)
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Etrap);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
 
+                    return;
+
+                }
 			
 	if (Pet.HealthPercent < 80 && !Pet.HasAuraById((int)Auras.MendPet) && AI.Controllers.Spell.CanCast((int)Spells.MendPet) && Pet.IsAlive)
 		{
@@ -412,6 +611,21 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
             }
         }
         #endregion
+		
+	public class DetectKeyPress
+    {
+        public static int Shift = 0x10;
+        public static int Ctrl = 0x11;
+        public static int Alt = 0x12;
+
+        public static int Z = 0x5A;
+        public static int X = 0x58;
+        public static int C = 0x43;
+ 
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        internal static extern short GetKeyState(int virtualKeyCode);
+
+    }
 
         public override void OnCombat(WowUnit TARGET)
         {
