@@ -79,6 +79,7 @@ namespace Anthrax
 			Incinerate = 29722,
 			IncFandB = 114654,
 			FandBrim = 108683,
+			RainofFire = 104232,
 			
 			
 			
@@ -156,6 +157,23 @@ if (TARGET.Health >= 1 && ME.InCombat)
 
 if (ME.HasAuraById((int)Auras.DestroCheck) && !IsCasting)
 { //Spec Check
+
+                if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.RainofFire)
+                         && !IsCasting)
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.RainofFire);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
 
 	if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Mana) <= 70 && AI.Controllers.Spell.CanCast((int)Spells.LifeTap) && ME.HealthPercent >= 50)
 		{
@@ -384,19 +402,26 @@ if (ME.HasAuraById((int)Auras.DemoCheck) && !IsCasting)
 
 
 
-
-
-
-
-
-
-
-
-
-
 if (ME.HasAuraById((int)Auras.DestroCheck) && !IsCasting)
 { //Spec Check
 
+
+                if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.RainofFire)
+                         && !IsCasting)
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.RainofFire);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
 	if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Mana) <= 70 && AI.Controllers.Spell.CanCast((int)Spells.LifeTap) && ME.HealthPercent >= 50)
 		{
 			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.LifeTap);
@@ -653,7 +678,22 @@ if (ME.HasAuraById((int)Auras.DemoCheck))
             }
         }
         #endregion
+	#region DetectKeyPress
+    public class DetectKeyPress
+    {
+        public static int Shift = 0x10;
+        public static int Ctrl = 0x11;
+        public static int Alt = 0x12;
 
+        public static int Z = 0x5A;
+        public static int X = 0x58;
+        public static int C = 0x43;
+ 
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        internal static extern short GetKeyState(int virtualKeyCode);
+
+    }
+    #endregion
         public override void OnCombat(WowUnit TARGET)
         {
             /* Performance tests
