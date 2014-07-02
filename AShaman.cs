@@ -31,6 +31,7 @@ namespace Anthrax
         #region private vars
         bool isAOE;
         WowLocalPlayer ME;
+		Settings CCSettings = new Settings();
 		private System.Timers.Timer wndCloser = new System.Timers.Timer(2000);
         //Stopwatch stopwatch;
         //List<long> averageScanTimes;
@@ -66,12 +67,20 @@ namespace Anthrax
 			StormBlast = 115356,
 			ChainL = 421,
 			FireNova = 1535,
+			ManaTideTotem = 16190,
+			HealingTideTotem = 108280,
+			HealingStreamTotem = 5394,
 			
 			//Resto
 			WaterS = 52127,
 			ELW = 51730,
 			ChainHeal = 1064,
 			Riptide = 61295,
+			Hrain = 73920,
+			ES = 974,
+			HW = 331,
+			GHW = 77472,
+			
 		
         }
 
@@ -89,6 +98,8 @@ namespace Anthrax
 			RestoCheck = 16196,
 			ELW = 52007,
 			WaterS = 52127,
+			ES = 974,
+			Riptide = 61295,
         }
 
         public enum FireTotems : int
@@ -267,8 +278,67 @@ if (ME.HasAuraById((int)Auras.EnhanceCheck))
 
 
 
+/////////////////////////////////////////////////////Resto//////////////////////////////////////////////////////
 
+if (ME.HasAuraById((int)Auras.RestoCheck))
+{
+//Mouseover Light's Hammer while Pressing Alt
+	if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.Hrain)
+                         && !IsCasting)
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Hrain);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
 
+                    return;
+
+                }
+
+	if (ME.HealthPercent <= 95 && TARGET.HealthPercent <= 95 && AI.Controllers.Spell.CanCast((int)Spells.HealingStreamTotem))
+               {          
+               WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HealingStreamTotem);
+               return;
+               }
+			   
+	if (DetectKeyPress.GetKeyState(DetectKeyPress.Shift) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.ES)
+                         && !IsCasting)
+                    {
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ES);
+                    }
+
+                    return;
+
+                }
+				
+					if (TARGET.HealthPercent <= CCSettings.GHW)
+                    {
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.GHW);
+                    }
+				
+	if (TARGET.HealthPercent <= CCSettings.Riptide && AI.Controllers.Spell.CanCast((int)Spells.Riptide) && !TARGET.HasAuraById((int)Auras.Riptide))
+                    {
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Riptide);
+                    }
+	if (TARGET.HealthPercent <= CCSettings.ChainHeal && ME.HealthPercent <= CCSettings.ChainHeal && AI.Controllers.Spell.CanCast((int)Spells.ChainHeal))
+                    {
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ChainHeal);
+                    }
+	if (TARGET.HealthPercent <= CCSettings.HW && AI.Controllers.Spell.CanCast((int)Spells.HW))
+                    {
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HW);
+                    }
+					
+					
+					
+} //Spec Check Resto
 } //Combat Check
 } //End Single Code
 #endregion
@@ -325,6 +395,7 @@ if (ME.HasAuraById((int)Auras.EnhanceCheck))
 				flag=true;
 			}
 		}
+		
 		
 				
 			if (ME.Auras.Where(x => x.SpellId == (int)Auras.MWeapon && x.StackCount >= 5).Any() && AI.Controllers.Spell.CanCast((int)Spells.ElementalBlast))
@@ -520,25 +591,50 @@ if (ME.HasAuraById((int)Auras.EnhanceCheck))
             SPQR.Logger.WriteLine("Elapsed:  " + stopwatch.ElapsedMilliseconds.ToString() + " miliseconds, average:" + (averageScanTimes.Sum() / averageScanTimes.Count()).ToString() + ",Max:" + averageScanTimes.Max());
             stopwatch.Restart();
              */
-            if (!Cooldown.IsGlobalCooldownActive && TARGET.IsValid)
+            if (!Cooldown.IsGlobalCooldownActive)
             {
                 if (isAOE) { castNextSpellbyAOEPriority(TARGET); } else { castNextSpellbySinglePriority(TARGET); }
             }
             if ((GetAsyncKeyState(90) == -32767))
             {
                 changeRotation();
-            }
-			
-		
+            }	
         }
 
         public override void OnLoad()   //This is called when the Customclass is loaded in SPQR
         {
+		try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(Settings));
+
+                using (StreamReader rd = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "\\Combats\\ADruid.xml"))
+                {
+                    CCSettings = xs.Deserialize(rd) as Settings;
+                }
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                if (CCSettings == null)
+                    CCSettings = new Settings();
+            }
             Logger.WriteLine("CustomClass " + Name + " Loaded");
         }
 
         public override void OnUnload() //This is called when the Customclass is unloaded in SPQR
         {
+		            try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(Settings));
+                using (StreamWriter wr = new StreamWriter(AppDomain.CurrentDomain.BaseDirectory + "\\Combats\\nrgdRET.xml"))
+                {
+                    xs.Serialize(wr, CCSettings);
+                }
+            }
+            catch { }
  
             Logger.WriteLine("CustomClass " + Name + " Unloaded, Goodbye !");
         }
@@ -558,9 +654,90 @@ if (ME.HasAuraById((int)Auras.EnhanceCheck))
             Logger.WriteLine("Stopping " + Name + " routine... gl smashing keys.");
         }
 		
+		public override object SettingsProperty
+        {
+            get
+            {
+                return CCSettings;
+            }
+        }
+	//Complex Healing Code
 
+//	public bool	NeedsHeals()
+//	{
+	
+//	}
 		
 		
-		
+		[Serializable]
+    public class Settings
+    {
+        public int GHW = 60;
+		public int Riptide = 95;
+		 public int ChainHeal = 93;
+		public int HW = 90;
+	//Healing Settings
+	//Greater Healing Wave
+		[XmlIgnore]
+        [CategoryAttribute("Restoration Settings"),
+        DisplayName("Greater Healing Wave Hp Limit"), DefaultValueAttribute(60)]
+        public int _GHW
+        {
+            get
+            {
+                return GHW;
+            }
+            set
+            {
+                GHW = value;
+            }
+        }
+	//RipTide
+		[XmlIgnore]
+        [CategoryAttribute("Restoration Settings"),
+        DisplayName("Riptide Hp Limit"), DefaultValueAttribute(95)]
+        public int _Riptide
+        {
+            get
+            {
+                return Riptide;
+            }
+            set
+            {
+                Riptide = value;
+            }
+        }
+		//ChainHeal
+		[XmlIgnore]
+        [CategoryAttribute("Restoration Settings"),
+        DisplayName("Chain Heal Hp Limit"), DefaultValueAttribute(93)]
+        public int _ChainHeal
+        {
+            get
+            {
+                return ChainHeal;
+            }
+            set
+            {
+                ChainHeal = value;
+            }
+        }	
+		//Healing Wave
+		[XmlIgnore]
+        [CategoryAttribute("Restoration Settings"),
+        DisplayName("Healing Wave Hp Limit"), DefaultValueAttribute(90)]
+        public int _HW
+        {
+            get
+            {
+                return HW;
+            }
+            set
+            {
+                HW = value;
+            }
+        }	
+
+	}
 		
 }}

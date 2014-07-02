@@ -127,7 +127,23 @@ if (TARGET.Health >= 1 && ME.InCombat)
 												///////////////////////////Protection////////////////////////
 if (ME.HasAuraById((int)Auras.ProtCheck))
 { //Spec Check
+	//Mouseover Light's Hammer while Pressing Alt
+	if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.LHammer)
+                         && !IsCasting)
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.LHammer);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
 
+                    return;
+
+                }
 
 			
 		if (!ME.HasAuraById((int)Auras.RF) && AI.Controllers.Spell.CanCast((int)Spells.RF))
