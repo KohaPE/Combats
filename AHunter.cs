@@ -68,6 +68,7 @@ namespace Anthrax
 			Pet3 = 83243,
 			RevivePet = 982,
 			Etrap = 82939,
+			Stampede = 121818,
         }
 
         internal enum Auras : int                       //This is another convenient list of Auras used in our combat routine
@@ -226,7 +227,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	var IsCasting = ObjectManager.LocalPlayer.IsCasting;
 	var Pet = ObjectManager.Pet;
 
-if (TARGET.Health >= 1 && ME.InCombat)
+if (TARGET.Health >= 1 && ME.InCombat && !IsCasting)
 { //Combat Check
 
 												///////////////////////////Beast Master////////////////////
@@ -268,7 +269,11 @@ if (ME.HasAuraById((int)Auras.BMCheck))
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.RapidFire);
                 return;
             }
-		
+	if (TARGET.MaxHealth >= 3000000 && AI.Controllers.Spell.CanCast((int)Spells.Stampede))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Stampede);
+                return;
+            }
 				//Arcane Shot Capp
 		if(Focus >= 90 && AI.Controllers.Spell.CanCast((int)Spells.ArcaneShot))
 		    {
@@ -288,6 +293,14 @@ if (ME.HasAuraById((int)Auras.BMCheck))
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FocusFire);
                 return;
             }
+		//KillCommand
+		if(AI.Controllers.Spell.CanCast((int)Spells.KillCommand))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.KillCommand);
+                return;
+            }		
+			
+
 			
 		//KillShot
 		if(TARGET.HealthPercent < 20 && AI.Controllers.Spell.CanCast((int)Spells.KillShot))
@@ -296,29 +309,29 @@ if (ME.HasAuraById((int)Auras.BMCheck))
                 return;
             }	
 			
-		//KillCommand
-		if(AI.Controllers.Spell.CanCast((int)Spells.KillCommand))
-		    {
-                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.KillCommand);
-                return;
-            }		
-			
-					//Glaive Toss
-		if(Focus >= 15 && AI.Controllers.Spell.CanCast((int)Spells.GlaiveToss))
+		//Glaive Toss
+		if(AI.Controllers.Spell.CanCast((int)Spells.GlaiveToss))
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.GlaiveToss);
                 return;
-            }	
+            }
+		//Dire Beast
+		if(AI.Controllers.Spell.CanCast((int)Spells.DireBeast))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DireBeast);
+                return;
+            }
+				
 			
 		//Arcane Shot Capp
-		if(Focus > 60 && AI.Controllers.Spell.CanCast((int)Spells.ArcaneShot))
+		if(Focus > 40 && AI.Controllers.Spell.CanCast((int)Spells.ArcaneShot))
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ArcaneShot);
                 return;
             }
 			
 				//CobraShot
-		if(Focus <= 60 && AI.Controllers.Spell.CanCast((int)Spells.CobraShot))
+		if(Focus <= 40 && AI.Controllers.Spell.CanCast((int)Spells.CobraShot))
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.CobraShot);
                 return;
@@ -365,6 +378,12 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.RapidFire);
                 return;
             }
+			
+	if (TARGET.MaxHealth >= 3000000 && AI.Controllers.Spell.CanCast((int)Spells.Stampede))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Stampede);
+                return;
+            }
 		//A Murder Of Crows
 		if(AI.Controllers.Spell.CanCast((int)Spells.AMurderOfCrows))
 		    {
@@ -405,6 +424,12 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.KillShot);
                 return;
             }
+		//Dire Beast
+		if(AI.Controllers.Spell.CanCast((int)Spells.DireBeast))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DireBeast);
+                return;
+            }
 		//Black Arrow
 		if(Focus >= 35 && AI.Controllers.Spell.CanCast((int)Spells.BlackArrow))
 		    {
@@ -439,7 +464,7 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
 	var IsCasting = ObjectManager.LocalPlayer.IsCasting;
 	var Pet = ObjectManager.Pet;
 		
-	if (TARGET.Health >= 1 && ME.InCombat)
+	if (TARGET.Health >= 1 && ME.InCombat && !IsCasting)
 { //Combat Check
 
 													///////////////////////////Beast Master////////////////////////
@@ -495,6 +520,12 @@ if (ME.HasAuraById((int)Auras.BMCheck))
 		if(Focus >= 15 && AI.Controllers.Spell.CanCast((int)Spells.GlaiveToss))
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.GlaiveToss);
+                return;
+            }
+				//Dire Beast
+		if(AI.Controllers.Spell.CanCast((int)Spells.DireBeast))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DireBeast);
                 return;
             }
 
@@ -568,6 +599,12 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
 		if(Focus >= 15 && AI.Controllers.Spell.CanCast((int)Spells.GlaiveToss))
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.GlaiveToss);
+                return;
+            }
+				//Dire Beast
+		if(AI.Controllers.Spell.CanCast((int)Spells.DireBeast))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DireBeast);
                 return;
             }
 
