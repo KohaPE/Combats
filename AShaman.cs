@@ -317,16 +317,17 @@ if (ME.HasAuraById((int)Auras.RestoCheck))
                     return;
 
                 }
+		if (TARGET.HealthPercent <= CCSettings.Riptide && AI.Controllers.Spell.CanCast((int)Spells.Riptide) && !TARGET.HasAuraById((int)Auras.Riptide))
+                    {
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Riptide);
+                    }
 				
 					if (TARGET.HealthPercent <= CCSettings.GHW)
                     {
                         WoW.Internals.ActionBar.ExecuteSpell((int)Spells.GHW);
                     }
 				
-	if (TARGET.HealthPercent <= CCSettings.Riptide && AI.Controllers.Spell.CanCast((int)Spells.Riptide) && !TARGET.HasAuraById((int)Auras.Riptide))
-                    {
-                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Riptide);
-                    }
+
 	if (TARGET.HealthPercent <= CCSettings.ChainHeal && ME.HealthPercent <= CCSettings.ChainHeal && AI.Controllers.Spell.CanCast((int)Spells.ChainHeal))
                     {
                         WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ChainHeal);
