@@ -597,7 +597,8 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 //Savage Roar if buff less then 3secs and Dosent Exist
  
 	if (ME.HasAuraById((int)Auras.GlyphofS) && !ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && ME.ComboPoints < 3 
-	|| !ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && ME.ComboPoints < 3)
+	|| !ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && ME.ComboPoints < 3
+	|| ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && ME.ComboPoints < 3 && ME.Auras.Where(x => x.SpellId == (int)Auras.SavageRoar && x.TimeLeft < 3000).Any() )
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageRoar);
                     return;
