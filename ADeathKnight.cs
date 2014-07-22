@@ -88,6 +88,7 @@ namespace Anthrax
 			PoF = 51271,
 			UnholyBlight = 115989,
 			BloodPresence = 48263,
+			DnD = 43265,
         }
 
         internal enum Auras : int                       //This is another convenient list of Auras used in our combat routine
@@ -151,6 +152,22 @@ namespace Anthrax
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BoneShield);
                 return;
             }
+			
+			if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.DnD))
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DnD);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
 			
 						                // Rune Strike
                 if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 89 &&
@@ -299,6 +316,22 @@ namespace Anthrax
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HoW);
                 return;
             }
+			
+			if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.DnD))
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DnD);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
 
             // We always want to face the target
             //WoW.Internals.Movements.Face(TARGET.Position);
@@ -344,23 +377,20 @@ namespace Anthrax
                     return;
 				}
 
-                if (!TARGET.HasAuraById((int)Auras.FrostFever) ||
-                    !TARGET.HasAuraById((int)Auras.BloodPlague))
-                {
-                    if (!TARGET.HasAuraById((int)Auras.FrostFever) &&
-                    AI.Controllers.Spell.CanCast((int)Spells.HowlingBlast))
-                    {
+                if (!TARGET.HasAuraById((int)Auras.FrostFever) && AI.Controllers.Spell.CanCast((int)Spells.HowlingBlast))
+					{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HowlingBlast);
                     return;
                     }
-                    if (!TARGET.HasAuraById((int)Auras.BloodPlague) &&
-                    AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike))
+					
+                    if (!TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike)
+					||  TARGET.HasAuraById((int)Auras.BloodPlague) && TARGET.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft <= 3000).Any() )
                     {
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
                     return;
                     }
                                      
-                }
+                
 				
 				 // Obliterate
                 if (AI.Controllers.Spell.CanCast((int)Spells.Obliterate))
@@ -421,6 +451,22 @@ namespace Anthrax
 		////////////////////////////////DW FROST  Written By schmiddi/////////////////////////////////////////////////////
 		if (ME.HasAuraById((int)Auras.FrostCheck) && TARGET.HasAuraById((int)Auras.DWCheck))
 		{
+		
+		if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.DnD))
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DnD);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
 			//Frost Strike if over 89 Runic Power
 			if (ME.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 89 && AI.Controllers.Spell.CanCast((int)Spells.FrostStrike) ||
 			ME.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 20 && AI.Controllers.Spell.CanCast((int)Spells.FrostStrike) && ME.HasAuraById((int)Auras.KillingM))
@@ -493,8 +539,41 @@ namespace Anthrax
         #region AOE>4 rotation
         private void castNextSpellbyAOEPriority(WowUnit TARGET)
         {
+		
+					if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.DnD))
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DnD);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
 		if (TARGET.Health >= 1 && ME.InCombat)
 		{
+		
+					if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.DnD))
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DnD);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
+				
         if (ME.HasAuraById((int)Auras.BloodCheck))
 		{
             // Bone Shield
@@ -718,7 +797,20 @@ namespace Anthrax
 
         } /////////////////END AOE ROTATION
         #endregion
+ public class DetectKeyPress
+    {
+        public static int Shift = 0x10;
+        public static int Ctrl = 0x11;
+        public static int Alt = 0x12;
 
+        public static int Z = 0x5A;
+        public static int X = 0x58;
+        public static int C = 0x43;
+ 
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        internal static extern short GetKeyState(int virtualKeyCode);
+
+    }
         #region auxFunctions
         public void changeRotation()
         {
