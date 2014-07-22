@@ -119,6 +119,7 @@ namespace Anthrax
 		UHB = 115989,
 		FrostCheck = 51128,
 		DWCheck = 51714,
+		UnholyCheck = 56835,
         }
         #endregion
 
@@ -140,6 +141,127 @@ namespace Anthrax
         #region singleRotation
         private void castNextSpellbySinglePriority(WowUnit TARGET)
 		{
+		
+		/////////////////////////////////////////////////////////////////////////////////////Unholy////////////////////////////////////////////////////////////////////////////////////////
+		
+		//Out Of Combat Pet Revive
+		
+		if (!WoW.Internals.ObjectManager.Pet.IsAlive)
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SummonPet);
+                return;
+            }
+
+		//Rotation
+		if (TARGET.Health >= 1 && ME.InCombat)
+		{
+        if (ME.HasAuraById((int)Auras.UnholyCheck))
+		{
+		
+		
+		///Death and Decay on Alt Press
+		if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.DnD))
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DnD);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
+		
+		//Dots//
+		
+		if (!TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike)
+		|| TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft <= 3000).Any() )
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
+                return;
+            }	
+			
+		//Dark Transformation
+		if (AI.Controllers.Spell.CanCast((int)Spells.DarkT) && ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) >= 1)
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DarkT);
+                    return;
+                }		
+		
+		
+		//Runic Power Cap
+		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 89 &&
+                    AI.Controllers.Spell.CanCast((int)Spells.DeathCoil))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DeathCoil);
+                    return;
+                }
+		
+		//Soul Reaper if target health at or below 35%		
+		if (TARGET.HealthPercent <= 35 && AI.Controllers.Spell.CanCast((int)Spells.SoulReaperUnholy) && ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) >= 1 )
+		        {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SoulReaperUnholy);
+                    return;
+                }
+		
+		//Death Coil
+		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 32 &&
+                    AI.Controllers.Spell.CanCast((int)Spells.DeathCoil))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DeathCoil);
+                    return;
+                }
+
+		//Scourge Strike if less then 90 runic power
+		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) < 90 &&
+                    AI.Controllers.Spell.CanCast((int)Spells.ScourgeStrike))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ScourgeStrike);
+                    return;
+                }
+
+		//Festering Strike if less the 90 Runic Power
+		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) < 90 && AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike)
+		|| AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft <= 15000).Any()
+		|| AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft <= 15000).Any() )
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FesteringStrike);
+                    return;
+                }
+		//Festering Strike if less the 90 Runic Power
+		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) < 90 &&
+                    AI.Controllers.Spell.CanCast((int)Spells.HoW))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HoW);
+                    return;
+                }		
+		
+		//BloodTap
+		if (ME.Auras.Where(x => x.SpellId == (int)Auras.BloodTap && x.StackCount >= 5).Any() && AI.Controllers.Spell.CanCast((int)Spells.BloodTap))
+		{
+			if (ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) <= 1
+			|| ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Frost) <= 1
+			|| ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Blood) <= 1
+			|| ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Death) < 1)
+			{
+			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodTap);
+			return;
+			}
+		}
+		//Death Coil
+		if (AI.Controllers.Spell.CanCast((int)Spells.DeathCoil))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DeathCoil);
+                    return;
+                }		
+		
+		}//end Combat
+		}//end spec check
+		////////////////////////////////////////////////////////////////////////////////////Blood Spec//////////////////////////////////////////////////////////////////////////////////////
 		if (TARGET.Health >= 1 && ME.InCombat)
 		{
         if (ME.HasAuraById((int)Auras.BloodCheck))
@@ -275,6 +397,13 @@ namespace Anthrax
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HoW);
                 return;
             }
+			
+			if (ME.Auras.Where(x => x.SpellId == (int)Auras.BloodTap && x.StackCount >= 5).Any() && AI.Controllers.Spell.CanCast((int)Spells.BloodTap))
+			{
+			//AI.Controllers.Spell.Cast((int)Spells.BloodTap, TARGET);
+			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodTap);
+			return;
+			}
                 
 			                // Rune Strike
                 if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) > 30 &&
@@ -574,6 +703,127 @@ namespace Anthrax
 
                 }
 				
+				
+		/////////////////////////////////////////////////////////////////////////////////////Unholy////////////////////////////////////////////////////////////////////////////////////////
+		
+		//Out Of Combat Pet Revive
+		
+		if (!WoW.Internals.ObjectManager.Pet.IsAlive)
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SummonPet);
+                return;
+            }
+
+		//Rotation
+		if (TARGET.Health >= 1 && ME.InCombat)
+		{
+        if (ME.HasAuraById((int)Auras.UnholyCheck))
+		{
+		
+		
+		///Death and Decay on Alt Press
+		if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.DnD))
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DnD);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
+		
+		//Dots//
+		
+		if (!TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike)
+		|| TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft <= 3000).Any() )
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
+                return;
+            }	
+			
+		//Dark Transformation
+		if (AI.Controllers.Spell.CanCast((int)Spells.DarkT) && ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) >= 1)
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DarkT);
+                    return;
+                }		
+		
+		//BloodBoil Spam
+		
+		if (AI.Controllers.Spell.CanCast((int)Spells.BloodBoil) && ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Death) >= 1)
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodBoil);
+                    return;
+                }
+
+				
+		//Runic Power Cap
+		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 89 &&
+                    AI.Controllers.Spell.CanCast((int)Spells.DeathCoil))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DeathCoil);
+                    return;
+                }
+		
+		//Death Coil
+		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 32 &&
+                    AI.Controllers.Spell.CanCast((int)Spells.DeathCoil))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DeathCoil);
+                    return;
+                }
+
+		//Festering Strike if less the 90 Runic Power
+		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) < 90 && AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FesteringStrike);
+                    return;
+                }
+		//Horn of Winter
+		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) < 90 &&
+                    AI.Controllers.Spell.CanCast((int)Spells.HoW))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HoW);
+                    return;
+                }		
+		
+		//BloodTap
+		if (ME.Auras.Where(x => x.SpellId == (int)Auras.BloodTap && x.StackCount >= 5).Any() && AI.Controllers.Spell.CanCast((int)Spells.BloodTap))
+		{
+			if (ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) <= 1
+			|| ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Frost) <= 1
+			|| ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Blood) <= 1
+			|| ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Death) < 1)
+			{
+			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodTap);
+			return;
+			}
+		}
+		//Death Coil
+		if (AI.Controllers.Spell.CanCast((int)Spells.DeathCoil))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DeathCoil);
+                    return;
+                }	
+
+		//Scourge Strike if less then 90 runic power
+		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) < 90 &&
+                    AI.Controllers.Spell.CanCast((int)Spells.ScourgeStrike) && ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) > 1)
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ScourgeStrike);
+                    return;
+                }				
+		
+		}//end Combat
+		}//end spec check
+
+////////////////////////////////////////////////////////////////////////////////////////BloodSpec////////////////////////////////////////////////////////////////////		
         if (ME.HasAuraById((int)Auras.BloodCheck))
 		{
             // Bone Shield
