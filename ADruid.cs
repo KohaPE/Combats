@@ -117,7 +117,7 @@ namespace Anthrax
             Barkskin = 22812,
 			Rake = 1822,
 			Rip = 1079,
-			SavageRoar = 62071,
+			SavageRoar = 127538,
 			PredSwiftness = 69369,
 			Thrash = 106830,
 			ThrashFeralBear = 77758,
@@ -154,6 +154,7 @@ namespace Anthrax
 			TigerFury = 5217,
 			NaturesVigil = 124974,
 			GlyphofShred = 114235,
+			Vis = 148903,
 }
 #endregion
 
@@ -191,13 +192,18 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 			lastStealthTick = Environment.TickCount;
 			return;
         }
-		
-	if (ME.HasAuraById((int)Auras.Prowl) && TARGET.Position.Distance3DFromPlayer < 5)
+
+	if (AI.Controllers.Spell.CanCast((int)Spells.Pounce) && Anthrax.WoW.Internals.Movements.IsFacingHeading(ObjectManager.Target.Position) && TARGET.Position.Distance3DFromPlayer < 5)
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Pounce);
                     return;
-            }	
-
+			}	
+	else
+	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage) && TARGET.Position.Distance3DFromPlayer < 5)
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Ravage);
+                    return;
+			}
 		
 		
 	if (TARGET.Health >= 1 && ME.InCombat)
@@ -212,17 +218,17 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	{
 	if (ME.HasAuraById((int)Auras.Prowl))
 	{
+	if (AI.Controllers.Spell.CanCast((int)Spells.Pounce) && Anthrax.WoW.Internals.Movements.IsFacingHeading(ObjectManager.Target.Position))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Pounce);
+                    return;
+			}	
+	else
 	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage))
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Ravage);
                     return;
-            }
-			
-	if (AI.Controllers.Spell.CanCast((int)Spells.Pounce))
-			{
-                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Pounce);
-                    return;
-            }
+			}
 	
 	
 	
@@ -558,9 +564,15 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		
 	if (ME.HasAuraById((int)Auras.Prowl))
 	{
-	if (AI.Controllers.Spell.CanCast((int)Spells.Pounce))
+	if (AI.Controllers.Spell.CanCast((int)Spells.Pounce) && Anthrax.WoW.Internals.Movements.IsFacingHeading(ObjectManager.Target.Position))
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Pounce);
+                    return;
+			}	
+	else
+	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Ravage);
                     return;
 			}	
 	}
@@ -596,16 +608,16 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
  
 //Savage Roar if buff less then 3secs and Dosent Exist
  
-	if (ME.HasAuraById((int)Auras.GlyphofS) && !ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && ME.ComboPoints < 3 
+	if (ME.HasAuraById((int)Auras.GlyphofS) && !ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar)
 	|| !ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && ME.ComboPoints < 3
-	|| ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && ME.ComboPoints < 3 && ME.Auras.Where(x => x.SpellId == (int)Auras.SavageRoar && x.TimeLeft < 3000).Any() )
+	|| ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && ME.ComboPoints >=5 && ME.Auras.Where(x => x.SpellId == (int)Auras.SavageRoar && x.TimeLeft < 3000).Any() )
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageRoar);
                     return;
             }
 			
 		
-	if (TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft > 10000).Any() && AI.Controllers.Spell.CanCast((int)Spells.FeroBite) && ME.ComboPoints > 4
+	if (TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft > 6000).Any() && AI.Controllers.Spell.CanCast((int)Spells.FeroBite) && ME.ComboPoints >= 5 && MyEnergy >= 40
 	|| TARGET.HealthPercent < 25 && ME.ComboPoints >= 4 && TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.FeroBite))
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FeroBite);
@@ -616,7 +628,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
  //overwire rip during Execute Range
  
  	if (!TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.Rip) && ME.ComboPoints >= 5
-	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft <= 6000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rip) && ME.ComboPoints >= 4 && AI.Controllers.Spell.CanCast((int)Spells.Rip)
+	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft < 6000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rip) && ME.ComboPoints >= 5 && AI.Controllers.Spell.CanCast((int)Spells.Rip)
 	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount <= 1).Any() && ME.ComboPoints >= 4 && AI.Controllers.Spell.CanCast((int)Spells.Rip))
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rip);
@@ -631,13 +643,15 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	
 	if (!TARGET.HasAuraById((int)Auras.Rake) && AI.Controllers.Spell.CanCast((int)Spells.Rake) && ME.ComboPoints < 4
 	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rake && x.TimeLeft < 5000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rake)
-	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount <= 2).Any() && ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.Rake))
+	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount <= 2).Any() && ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.Rake)
+	|| ME.HasAuraById((int)Auras.Vis) && AI.Controllers.Spell.CanCast((int)Spells.Rake) && ME.ComboPoints < 4)
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rake);
                     return;
         }
-		
-	if (!TARGET.HasAuraById((int)Auras.Thrash) && AI.Controllers.Spell.CanCast((int)Spells.ThrashFeral) && TARGET.HasAuraById((int)Auras.Rip) && TARGET.HasAuraById((int)Auras.Rake) && ME.ComboPoints > 3)
+
+	
+	if (!TARGET.HasAuraById((int)Auras.Thrash) && AI.Controllers.Spell.CanCast((int)Spells.ThrashFeral) && ME.HasAuraById((int)Auras.CC))
 		{
 		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ThrashFeral);
 		}
@@ -651,9 +665,15 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		
 	
 	
-	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.MangleFeral))
+	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.MangleFeral) && Anthrax.WoW.Internals.Movements.IsFacingHeading(ObjectManager.Target.Position) && MyEnergy >= 40)
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.MangleFeral);
+                    return;
+        }
+		else
+	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.Shred))
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Shred);
                     return;
         }
 	
