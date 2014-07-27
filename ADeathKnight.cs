@@ -89,6 +89,8 @@ namespace Anthrax
 			UnholyBlight = 115989,
 			BloodPresence = 48263,
 			DnD = 43265,
+			UnholyFrenzy = 49016,
+			Garg = 49206,
         }
 
         internal enum Auras : int                       //This is another convenient list of Auras used in our combat routine
@@ -120,6 +122,11 @@ namespace Anthrax
 		FrostCheck = 51128,
 		DWCheck = 51714,
 		UnholyCheck = 56835,
+		DeathS = 144901,
+		SGarg = 49206,
+		UnholyF = 49016,
+		Str1 = 138702,
+		Str2 = 148899,
         }
         #endregion
 
@@ -139,6 +146,9 @@ namespace Anthrax
 
         }
         #region singleRotation
+		
+		private int lastDeathSTick = 0;
+		
         private void castNextSpellbySinglePriority(WowUnit TARGET)
 		{
 		
@@ -175,7 +185,21 @@ namespace Anthrax
                     return;
 
                 }
-		
+				
+		//Unholy Strengh for Massive Dot Dps!
+		if (ME.HasAuraById((int)Auras.Str1) && ME.HasAuraById((int)Auras.Str2) && AI.Controllers.Spell.CanCast((int)Spells.UnholyFrenzy))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.UnholyFrenzy);
+                    return;
+                }
+				
+		//GARGOYLE!!!
+		if (ME.HasAuraById((int)Auras.Str1) && ME.HasAuraById((int)Auras.Str2) && AI.Controllers.Spell.CanCast((int)Spells.Garg) && ME.HasAuraById((int)Auras.UnholyF))
+                {
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Garg);
+                    return;
+                }
+				
 		//Dots//
 		
 		if (!TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike)
@@ -183,8 +207,20 @@ namespace Anthrax
 			{
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
                 return;
-            }	
-			
+            }
+
+		//Rebuffing Dots if Higher DPS
+		if (TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike) && ME.HasAuraById((int)Auras.UnholyF) && Environment.TickCount - lastDeathSTick > 8000
+		&& ME.HasAuraById((int)Auras.Str1) && ME.HasAuraById((int)Auras.Str2)
+		|| ME.HasAuraById((int)Auras.Str1) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike) && Environment.TickCount - lastDeathSTick > 8000
+		|| ME.HasAuraById((int)Auras.Str2) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike) && Environment.TickCount - lastDeathSTick > 8000
+		|| ME.HasAuraById((int)Auras.Str1) && ME.HasAuraById((int)Auras.Str2) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike) && Environment.TickCount - lastDeathSTick > 8000
+		|| ME.Auras.Where(x => x.SpellId == (int)Auras.DeathS && x.StackCount >= 8).Any() && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike) && Environment.TickCount - lastDeathSTick > 8000)
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
+				lastDeathSTick = Environment.TickCount;
+                return;
+            }			
 		//Dark Transformation
 		if (AI.Controllers.Spell.CanCast((int)Spells.DarkT) && ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) >= 1)
                 {
@@ -218,7 +254,8 @@ namespace Anthrax
 
 		//Scourge Strike if less then 90 runic power
 		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) < 90 &&
-                    AI.Controllers.Spell.CanCast((int)Spells.ScourgeStrike))
+                    AI.Controllers.Spell.CanCast((int)Spells.ScourgeStrike) && TARGET.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft >= 30000).Any()
+		|| ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) >= 2 && AI.Controllers.Spell.CanCast((int)Spells.ScourgeStrike))
                 {
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ScourgeStrike);
                     return;
@@ -226,8 +263,8 @@ namespace Anthrax
 
 		//Festering Strike if less the 90 Runic Power
 		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) < 90 && AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike)
-		|| AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft <= 15000).Any()
-		|| AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft <= 15000).Any() )
+		|| AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft <= 20000).Any()
+		|| AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft <= 20000).Any() )
                 {
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FesteringStrike);
                     return;
