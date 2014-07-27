@@ -618,7 +618,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 			
 		
 	if (TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft > 6000).Any() && AI.Controllers.Spell.CanCast((int)Spells.FeroBite) && ME.ComboPoints >= 5 && MyEnergy >= 40
-	|| TARGET.HealthPercent < 25 && ME.ComboPoints >= 4 && TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.FeroBite))
+	|| TARGET.HealthPercent < 25 && ME.ComboPoints >= 4 && TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.FeroBite) && MyEnergy >= 40)
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FeroBite);
                     return;
@@ -642,7 +642,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		}
 	
 	if (!TARGET.HasAuraById((int)Auras.Rake) && AI.Controllers.Spell.CanCast((int)Spells.Rake) && ME.ComboPoints < 4
-	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rake && x.TimeLeft < 5000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rake)
+	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rake && x.TimeLeft < 5000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rake) && ME.ComboPoints < 4
 	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount <= 2).Any() && ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.Rake)
 	|| ME.HasAuraById((int)Auras.Vis) && AI.Controllers.Spell.CanCast((int)Spells.Rake) && ME.ComboPoints < 4)
 		{
