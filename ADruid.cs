@@ -193,13 +193,13 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 			return;
         }
 
-	if (AI.Controllers.Spell.CanCast((int)Spells.Pounce) && Anthrax.WoW.Internals.Movements.IsFacingHeading(ObjectManager.Target.Position) && TARGET.Position.Distance3DFromPlayer < 5)
+	if (AI.Controllers.Spell.CanCast((int)Spells.Pounce) && !WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target) && TARGET.Position.Distance3DFromPlayer < 5)
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Pounce);
                     return;
 			}	
 	else
-	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage) && TARGET.Position.Distance3DFromPlayer < 5)
+	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage) && WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target) && TARGET.Position.Distance3DFromPlayer < 5)
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Ravage);
                     return;
@@ -564,22 +564,25 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		
 	if (ME.HasAuraById((int)Auras.Prowl))
 	{
-	if (AI.Controllers.Spell.CanCast((int)Spells.Pounce) && Anthrax.WoW.Internals.Movements.IsFacingHeading(ObjectManager.Target.Position))
-			{
-                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Pounce);
-                    return;
-			}	
-	else
-	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage))
+
+
+	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage) && WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target))
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Ravage);
+                    return;
+			}	
+			
+		if (AI.Controllers.Spell.CanCast((int)Spells.Pounce))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Pounce);
                     return;
 			}	
 	}
 	
 //Boss Cooldowns Auto.
 
-	if(ObjectManager.Target.CreatureCache.Classification == WoW.Classes.WowCreatureCache.WowUnitClassification.WorldBoss && TARGET.Position.Distance3DFromPlayer < 8 && !ME.HasAuraById((int)Auras.TigerFury) && AI.Controllers.Spell.CanCast((int)Spells.Berserk))
+	if(ObjectManager.Target.CreatureCache.Classification == WoW.Classes.WowCreatureCache.WowUnitClassification.WorldBoss && TARGET.Position.Distance3DFromPlayer < 8 && !ME.HasAuraById((int)Auras.TigerFury) && AI.Controllers.Spell.CanCast((int)Spells.Berserk)
+	|| ObjectManager.Target.CreatureCache.Classification == WoW.Classes.WowCreatureCache.WowUnitClassification.RareElite && TARGET.Position.Distance3DFromPlayer < 8 && !ME.HasAuraById((int)Auras.TigerFury) && AI.Controllers.Spell.CanCast((int)Spells.Berserk))
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Berserk);
                     return;
@@ -663,15 +666,15 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.TigerFury);
 		}
 		
-	
-	
-	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.MangleFeral) && Anthrax.WoW.Internals.Movements.IsFacingHeading(ObjectManager.Target.Position) && MyEnergy >= 40)
+		
+		
+	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.MangleFeral) && !WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target) && MyEnergy >= 40)
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.MangleFeral);
                     return;
         }
-		else
-	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.Shred))
+
+				if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.Shred) && WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target))
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Shred);
                     return;
