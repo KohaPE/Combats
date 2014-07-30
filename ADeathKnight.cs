@@ -156,7 +156,7 @@ namespace Anthrax
 		
 		//Out Of Combat Pet Revive
 		
-		if (!WoW.Internals.ObjectManager.Pet.IsAlive && ME.HasAuraById((int)Auras.UnholyCheck))
+		if (!WoW.Internals.ObjectManager.Pet.IsAlive && ME.HasAuraById((int)Auras.UnholyCheck) && !ME.IsMounted)
 			{
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SummonPet);
                 return;

@@ -193,13 +193,13 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 			return;
         }
 
-	if (AI.Controllers.Spell.CanCast((int)Spells.Pounce) && !WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target) && TARGET.Position.Distance3DFromPlayer < 5)
+	if (AI.Controllers.Spell.CanCast((int)Spells.Pounce) && !WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target) && TARGET.Position.Distance3DFromPlayer < 8)
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Pounce);
                     return;
 			}	
 	else
-	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage) && WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target) && TARGET.Position.Distance3DFromPlayer < 5)
+	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage) && WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target) && TARGET.Position.Distance3DFromPlayer < 8)
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Ravage);
                     return;
