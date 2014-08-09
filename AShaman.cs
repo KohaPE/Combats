@@ -70,6 +70,9 @@ namespace Anthrax
 			ManaTideTotem = 16190,
 			HealingTideTotem = 108280,
 			HealingStreamTotem = 5394,
+			EQ = 61882,
+			LavaBurst = 51505,
+			LavaBeam = 114074,
 			
 			//Resto
 			WaterS = 52127,
@@ -100,6 +103,10 @@ namespace Anthrax
 			WaterS = 52127,
 			ES = 974,
 			Riptide = 61295,
+			EleCheck = 88764,
+			Full = 95774,
+			LavaS = 77762,
+			Ass = 114050,
         }
 
         public enum FireTotems : int
@@ -165,6 +172,20 @@ if (ME.HasAuraById((int)Auras.EnhanceCheck))
         }	
 }
 
+if (ME.HasAuraById((int)Auras.EleCheck))
+{	
+	if (!ME.HasAuraById((int)Auras.FTW))
+	    {
+        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FTW);
+        return;
+        }
+		
+		if (!ME.HasAuraById((int)Auras.LightningShield))
+	    {
+        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.LightningShield);
+        return;
+        }	
+}
 
 if (ME.HasAuraById((int)Auras.RestoCheck))
 {	
@@ -184,6 +205,101 @@ if (ME.HasAuraById((int)Auras.RestoCheck))
 
 if (TARGET.Health >= 1 && ME.InCombat)
 { //Combat Check
+
+												///////////////////////////ELEMENTAL////////////////////////
+if (ME.HasAuraById((int)Auras.EleCheck))
+{ //Spec Check
+
+//Totem Codes
+	
+		//Mouseover Light's Hammer while Pressing Alt
+	if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.EQ)
+                         && !IsCasting)
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.EQ);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
+					
+		if( ((int)timeDiff.TotalMilliseconds > 60000+seed)  || !flag)
+			{
+				//SPQR.Logger.WriteLine("Casting searing totem, seconds= "+(int)timeDiff.TotalMilliseconds);
+				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SearingTotem);
+				
+				while(!AI.Controllers.Spell.CanCast((int)Spells.SearingTotem))
+					System.Threading.Thread.Sleep(30);
+					
+				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SearingTotem); 
+				
+				start_time = DateTime.Now; 
+				flag=true;
+			}
+		
+	
+				if (AI.Controllers.Spell.CanCast((int)Spells.LavaBurst) && ME.HasAuraById((int)Auras.LavaS))
+                        {
+                            
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.LavaBurst);
+                            return;
+                        }
+			            if (AI.Controllers.Spell.CanCast((int)Spells.LavaBurst))
+                        {
+                           
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.LavaBurst);
+                            return;
+                        }		
+
+
+             if (!TARGET.HasAuraById((int)Auras.FlameShock) && AI.Controllers.Spell.CanCast((int)Spells.FlameShock)
+				|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.FlameShock && x.TimeLeft < 8000).Any()) 
+                        {
+
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FlameShock);
+                            return;
+                        }	
+						
+			if (AI.Controllers.Spell.CanCast((int)Spells.ElementalBlast))
+                        {
+                            
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ElementalBlast);
+                            return;
+                        }
+						
+			if (AI.Controllers.Spell.CanCast((int)Spells.UnleashE))
+                        {
+                            
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.UnleashE);
+                            return;
+                        }
+			
+
+				
+		if (AI.Controllers.Spell.CanCast((int)Spells.HearthShock) && ME.HasAuraById((int)Auras.Full) && TARGET.Auras.Where(x => x.SpellId == (int)Auras.FlameShock && x.TimeLeft > 8000).Any() )
+                        {
+                            
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HearthShock);
+                            return;
+                        }
+
+            if(AI.Controllers.Spell.CanCast((int)Spells.LightingBolt))
+                        {
+                           
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.LightingBolt);
+                            return;
+                        }
+
+						
+
+} //End of Spec Check
 												///////////////////////////Enhancement////////////////////////
 if (ME.HasAuraById((int)Auras.EnhanceCheck))
 { //Spec Check
@@ -353,7 +469,9 @@ if (ME.HasAuraById((int)Auras.RestoCheck))
 	Random rnd = new Random();
 	int seed = rnd.Next(250,1000);
 	TimeSpan timeDiff = DateTime.Now - start_time;
-	
+
+if (ME.HasAuraById((int)Auras.EnhanceCheck))
+{	
 	if (!ME.HasAuraById((int)Auras.FTW))
 	    {
         WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FTW);
@@ -371,10 +489,139 @@ if (ME.HasAuraById((int)Auras.RestoCheck))
         WoW.Internals.ActionBar.ExecuteSpell((int)Spells.LightningShield);
         return;
         }	
+}
+
+if (ME.HasAuraById((int)Auras.EleCheck))
+{	
+	if (!ME.HasAuraById((int)Auras.FTW))
+	    {
+        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FTW);
+        return;
+        }
 		
+		if (!ME.HasAuraById((int)Auras.LightningShield))
+	    {
+        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.LightningShield);
+        return;
+        }	
+}
+
+if (ME.HasAuraById((int)Auras.RestoCheck))
+{	
+	if (!ME.HasAuraById((int)Auras.ELW))
+	    {
+        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ELW);
+        return;
+        }
+		
+		if (!ME.HasAuraById((int)Auras.WaterS))
+	    {
+        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.WaterS);
+        return;
+        }	
+}
+
 if (TARGET.Health >= 1 && ME.InCombat)
 { //Combat Check
 
+
+												///////////////////////////ELEMENTAL////////////////////////
+if (ME.HasAuraById((int)Auras.EleCheck))
+{ //Spec Check
+
+//Totem Codes
+	
+		//Mouseover Light's Hammer while Pressing Alt
+	if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.EQ)
+                         && !IsCasting)
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.EQ);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
+					
+		if( ((int)timeDiff.TotalMilliseconds > 60000+seed)  || !flag)
+			{
+				//SPQR.Logger.WriteLine("Casting searing totem, seconds= "+(int)timeDiff.TotalMilliseconds);
+				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SearingTotem);
+				
+				while(!AI.Controllers.Spell.CanCast((int)Spells.SearingTotem))
+					System.Threading.Thread.Sleep(30);
+					
+				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SearingTotem); 
+				
+				start_time = DateTime.Now; 
+				flag=true;
+			}
+		
+	
+	
+	
+				if (AI.Controllers.Spell.CanCast((int)Spells.LavaBurst) && ME.HasAuraById((int)Auras.LavaS))
+                        {
+                            
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.LavaBurst);
+                            return;
+                        }
+						
+				if (AI.Controllers.Spell.CanCast((int)Spells.LavaBeam) && ME.HasAuraById((int)Auras.Ass))
+                        {
+                            
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.LavaBeam);
+                            return;
+                        }						
+				 
+			            if (AI.Controllers.Spell.CanCast((int)Spells.LavaBurst))
+                        {
+                           
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.LavaBurst);
+                            return;
+                        }							
+
+
+             if (!TARGET.HasAuraById((int)Auras.FlameShock) && AI.Controllers.Spell.CanCast((int)Spells.FlameShock)
+				|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.FlameShock && x.TimeLeft < 8000).Any()) 
+                        {
+
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FlameShock);
+                            return;
+                        }	
+						
+			if (AI.Controllers.Spell.CanCast((int)Spells.ElementalBlast))
+                        {
+                            
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ElementalBlast);
+                            return;
+                        }
+			
+
+				
+		if (AI.Controllers.Spell.CanCast((int)Spells.HearthShock) && ME.HasAuraById((int)Auras.Full) && TARGET.Auras.Where(x => x.SpellId == (int)Auras.FlameShock && x.TimeLeft > 8000).Any() )
+                        {
+                            
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HearthShock);
+                            return;
+                        }
+
+            if(AI.Controllers.Spell.CanCast((int)Spells.ChainL))
+                        {
+                           
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ChainL);
+                            return;
+                        }
+
+						
+
+} //End of Spec Check
 //////////////////////////////////////////////////////////Enhance AoE/////////////////////////////////////////////
 
 //Totem Codes
