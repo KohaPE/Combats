@@ -264,6 +264,14 @@ if (ME.HasAuraById((int)Auras.BMCheck))
             return;
         }
 		
+//	if (Anthrax.WoW.Classes.ObjectManager.WowLocalPlayer.UnitsAttackingMe > 0 && Anthrax.WoW.Classes.ObjectManager.WowUnit.GetThreatEntry(Anthrax.WoW.Classes.ObjectManager.WowUnit) > 90
+//	&& !ME.HasAuraById((int)Auras.Misdirection))
+			
+//			{
+ //               WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Misdirect);
+  //              return;
+//            }
+		
 	if (ME.HasAuraById((int)Auras.T162P) && AI.Controllers.Spell.CanCast((int)Spells.RapidFire))
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.RapidFire);
@@ -437,7 +445,8 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
                 return;
             }
 		//Arcane Shot
-		if(AI.Controllers.Spell.CanCast((int)Spells.ArcaneShot) && Focus >= 40)
+		if(AI.Controllers.Spell.CanCast((int)Spells.ArcaneShot) && !AI.Controllers.Spell.CanCast((int)Spells.AMurderOfCrows) && !AI.Controllers.Spell.CanCast((int)Spells.BlackArrow)
+		&& !AI.Controllers.Spell.CanCast((int)Spells.DireBeast) && !AI.Controllers.Spell.CanCast((int)Spells.GlaiveToss) && !AI.Controllers.Spell.CanCast((int)Spells.ExplosiveShot) && Focus > 35)
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ArcaneShot);
                 return;
