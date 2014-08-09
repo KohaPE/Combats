@@ -331,7 +331,7 @@ if (ME.HasAuraById((int)Auras.BMCheck))
             }
 			
 				//CobraShot
-		if(Focus <= 40 && AI.Controllers.Spell.CanCast((int)Spells.CobraShot))
+		if(Focus <= 60 && AI.Controllers.Spell.CanCast((int)Spells.CobraShot))
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.CobraShot);
                 return;
