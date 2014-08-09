@@ -143,6 +143,9 @@ public override void OnPull(WoW.Classes.ObjectManager.WowUnit unit)
 //public override void OnCombat(WoW.Classes.ObjectManager.WowUnit unit)
 //{}
 
+private int lastLBTick = 0;
+private int lastCLTick = 0;
+
 private void castNextSpellbySinglePriority(WowUnit TARGET)
 {
 
@@ -290,10 +293,11 @@ if (ME.HasAuraById((int)Auras.EleCheck))
                             return;
                         }
 
-            if(AI.Controllers.Spell.CanCast((int)Spells.LightingBolt))
+            if(AI.Controllers.Spell.CanCast((int)Spells.LightingBolt) && Environment.TickCount - lastLBTick > 1850)
                         {
                            
                             WoW.Internals.ActionBar.ExecuteSpell((int)Spells.LightingBolt);
+							lastLBTick = Environment.TickCount;
                             return;
                         }
 
@@ -521,6 +525,24 @@ if (ME.HasAuraById((int)Auras.RestoCheck))
         }	
 }
 
+		//Mouseover Light's Hammer while Pressing Alt
+	if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.EQ)
+                         && !IsCasting)
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.EQ);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
+
 if (TARGET.Health >= 1 && ME.InCombat)
 { //Combat Check
 
@@ -612,10 +634,11 @@ if (ME.HasAuraById((int)Auras.EleCheck))
                             return;
                         }
 
-            if(AI.Controllers.Spell.CanCast((int)Spells.ChainL))
+            if(AI.Controllers.Spell.CanCast((int)Spells.ChainL) && Environment.TickCount - lastCLTick > 1350)
                         {
                            
                             WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ChainL);
+							lastCLTick = Environment.TickCount;
                             return;
                         }
 
