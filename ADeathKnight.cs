@@ -43,6 +43,7 @@ namespace Anthrax
         #region private vars
         bool isAOE;
         WowLocalPlayer ME;
+		Settings CCSettings = new Settings();
         //Stopwatch stopwatch;
         //List<long> averageScanTimes;
         #endregion
@@ -148,6 +149,7 @@ namespace Anthrax
         #region singleRotation
 		
 		private int lastDeathSTick = 0;
+		private int lastConversionTick = 0;
 		
         private void castNextSpellbySinglePriority(WowUnit TARGET)
 		{
@@ -161,6 +163,15 @@ namespace Anthrax
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SummonPet);
                 return;
             }
+			
+		if(ME.HealthPercent <= CCSettings.Conversion && AI.Controllers.Spell.CanCast((int)Spells.Conversion) && ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 10 
+		&& Environment.TickCount - lastConversionTick > 2000 && !ME.HasAuraById((int)Auras.Conversion))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Conversion);
+				lastConversionTick = Environment.TickCount;
+                return;
+            }
+
 
 		//Rotation
 		if (TARGET.Health >= 1 && ME.InCombat)
@@ -185,6 +196,14 @@ namespace Anthrax
                     return;
 
                 }
+				
+		if(ME.HealthPercent <= CCSettings.Conversion && AI.Controllers.Spell.CanCast((int)Spells.Conversion) && ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 10 
+		&& Environment.TickCount - lastConversionTick > 2000 && !ME.HasAuraById((int)Auras.Conversion))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Conversion);
+				lastConversionTick = Environment.TickCount;
+                return;
+            }
 				
 		//Unholy Strengh for Massive Dot Dps!
 		if (ME.HasAuraById((int)Auras.Str1) && ME.HasAuraById((int)Auras.Str2) && AI.Controllers.Spell.CanCast((int)Spells.UnholyFrenzy))
@@ -303,6 +322,14 @@ namespace Anthrax
 		{
         if (ME.HasAuraById((int)Auras.BloodCheck))
 		{
+		
+		if(ME.HealthPercent <= CCSettings.Conversion && AI.Controllers.Spell.CanCast((int)Spells.Conversion) && ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 10 
+		&& Environment.TickCount - lastConversionTick > 2000 && !ME.HasAuraById((int)Auras.Conversion))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Conversion);
+				lastConversionTick = Environment.TickCount;
+                return;
+            }
             // Bone Shield
             if ((!ME.HasAuraById((int)Auras.BoneShield) ||
                 ME.Auras.Where(x => x.SpellId == (int)Auras.BoneShield && x.StackCount <= 1).Any()) &&
@@ -362,6 +389,19 @@ namespace Anthrax
 
                 // Deseases
 				
+				if (!TARGET.HasAuraById((int)Auras.FrostFever) &&
+                            AI.Controllers.Spell.CanCast((int)Spells.IcyTouch))
+                        {
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.IcyTouch);
+                            return;
+                        }
+                 if (!TARGET.HasAuraById((int)Auras.BloodPlague) &&
+                            AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike))
+                        {
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
+                            return;
+                        }
+				
 				if (ME.HasAuraById((int)Auras.CS) && TARGET.Position.Distance3DFromPlayer < 13)
 				{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodBoil);
@@ -388,25 +428,13 @@ namespace Anthrax
                 }
 				
 				if (!ME.HasAuraById((int)Auras.BloodShield) && TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.DeathStrike) 
-				|| (ME.HasAuraById((int)Auras.BloodShield) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodShield && x.TimeLeft <= 6000).Any() && AI.Controllers.Spell.CanCast((int)Spells.DeathStrike)))
+				|| (ME.HasAuraById((int)Auras.BloodShield) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodShield && x.TimeLeft <= 7000).Any() && AI.Controllers.Spell.CanCast((int)Spells.DeathStrike)))
 				{
 					WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DeathStrike);
 					return;
 				}
 
                 
-                if (!TARGET.HasAuraById((int)Auras.FrostFever) &&
-                            AI.Controllers.Spell.CanCast((int)Spells.IcyTouch))
-                        {
-                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.IcyTouch);
-                            return;
-                        }
-                 if (!TARGET.HasAuraById((int)Auras.BloodPlague) &&
-                            AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike))
-                        {
-                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
-                            return;
-                        }
                                      
                 
                                 
@@ -441,7 +469,7 @@ namespace Anthrax
 			}
                 
 			                // Rune Strike
-                if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) > 30 &&
+                if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) > 29 &&
                     AI.Controllers.Spell.CanCast((int)Spells.RuneStrike))
                 {
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.RuneStrike);
@@ -496,6 +524,14 @@ namespace Anthrax
                     return;
 
                 }
+				
+		if(ME.HealthPercent <= CCSettings.Conversion && AI.Controllers.Spell.CanCast((int)Spells.Conversion) && ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 10 
+		&& Environment.TickCount - lastConversionTick > 2000 && !ME.HasAuraById((int)Auras.Conversion))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Conversion);
+				lastConversionTick = Environment.TickCount;
+                return;
+            }
 
             // We always want to face the target
             //WoW.Internals.Movements.Face(TARGET.Position);
@@ -632,6 +668,14 @@ namespace Anthrax
                     return;
 
                 }
+				
+						if(ME.HealthPercent <= CCSettings.Conversion && AI.Controllers.Spell.CanCast((int)Spells.Conversion) && ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 10 
+		&& Environment.TickCount - lastConversionTick > 2000 && !ME.HasAuraById((int)Auras.Conversion))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Conversion);
+				lastConversionTick = Environment.TickCount;
+                return;
+            }
 			//Frost Strike if over 89 Runic Power
 			if (ME.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 89 && AI.Controllers.Spell.CanCast((int)Spells.FrostStrike) ||
 			ME.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 20 && AI.Controllers.Spell.CanCast((int)Spells.FrostStrike) && ME.HasAuraById((int)Auras.KillingM))
@@ -727,6 +771,16 @@ namespace Anthrax
                     return;
 
                 }
+				
+		if(ME.HealthPercent <= CCSettings.Conversion && AI.Controllers.Spell.CanCast((int)Spells.Conversion) && ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 10 
+		&& Environment.TickCount - lastConversionTick > 2000 && !ME.HasAuraById((int)Auras.Conversion))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Conversion);
+				lastConversionTick = Environment.TickCount;
+                return;
+            }
+			
+			
 		if (TARGET.Health >= 1 && ME.InCombat)
 		{
 		
@@ -756,6 +810,23 @@ namespace Anthrax
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SummonPet);
                 return;
             }
+			
+							///Death and Decay on Alt Press
+		if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.DnD))
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DnD);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
 
 		//Rotation
 		if (TARGET.Health >= 1 && ME.InCombat)
@@ -780,7 +851,13 @@ namespace Anthrax
                     return;
 
                 }
-		
+				if(ME.HealthPercent <= CCSettings.Conversion && AI.Controllers.Spell.CanCast((int)Spells.Conversion) && ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 10 
+		&& Environment.TickCount - lastConversionTick > 2000 && !ME.HasAuraById((int)Auras.Conversion))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Conversion);
+				lastConversionTick = Environment.TickCount;
+                return;
+            }
 		//Dots//
 		
 		if (!TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike)
@@ -884,6 +961,30 @@ namespace Anthrax
                 return;
             }
 			
+					///Death and Decay on Alt Press
+		if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.DnD))
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DnD);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
+				if(ME.HealthPercent <= CCSettings.Conversion && AI.Controllers.Spell.CanCast((int)Spells.Conversion) && ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 10 
+		&& Environment.TickCount - lastConversionTick > 2000 && !ME.HasAuraById((int)Auras.Conversion))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Conversion);
+				lastConversionTick = Environment.TickCount;
+                return;
+            }
+			
 						                // Rune Strike
                 if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 89 &&
                     AI.Controllers.Spell.CanCast((int)Spells.RuneStrike))
@@ -917,6 +1018,19 @@ namespace Anthrax
 			
 
                 // Deseases
+				
+			if (!TARGET.HasAuraById((int)Auras.FrostFever) &&
+                            AI.Controllers.Spell.CanCast((int)Spells.IcyTouch))
+                        {
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.IcyTouch);
+                            return;
+                        }
+                 if (!TARGET.HasAuraById((int)Auras.BloodPlague) &&
+                            AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike))
+                        {
+                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
+                            return;
+                        }
 				
 				if (ME.HasAuraById((int)Auras.CS) && TARGET.Position.Distance3DFromPlayer <= 15)
 				{
@@ -952,23 +1066,6 @@ namespace Anthrax
 					return;
 				}
 
-                if (!TARGET.HasAuraById((int)Auras.FrostFever) ||
-                    !TARGET.HasAuraById((int)Auras.BloodPlague))
-                {
-                        if (!TARGET.HasAuraById((int)Auras.FrostFever) &&
-                            AI.Controllers.Spell.CanCast((int)Spells.IcyTouch))
-                        {
-                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.IcyTouch);
-                            return;
-                        }
-                        if (!TARGET.HasAuraById((int)Auras.BloodPlague) &&
-                            AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike))
-                        {
-                            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
-                            return;
-                        }
-                                     
-                }
                                 
                 // Death Strike
                 if (AI.Controllers.Spell.CanCast((int)Spells.DeathStrike))
@@ -996,7 +1093,7 @@ namespace Anthrax
             }
                 
 			                // Rune Strike
-                if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 30 &&
+                if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) > 29 &&
                     AI.Controllers.Spell.CanCast((int)Spells.RuneStrike))
                 {
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.RuneStrike);
@@ -1030,6 +1127,31 @@ namespace Anthrax
 		
 		if (ME.HasAuraById((int)Auras.FrostCheck))
 		{
+		
+				///Death and Decay on Alt Press
+		if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.DnD))
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DnD);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
+				if(ME.HealthPercent <= CCSettings.Conversion && AI.Controllers.Spell.CanCast((int)Spells.Conversion) && ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 10 
+		&& Environment.TickCount - lastConversionTick > 2000 && !ME.HasAuraById((int)Auras.Conversion))
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Conversion);
+				lastConversionTick = Environment.TickCount;
+                return;
+            }
+			
 			//Frost Strike if over 89 Runic Power
 			if (ME.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 89 && AI.Controllers.Spell.CanCast((int)Spells.FrostStrike) ||
 			ME.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 20 && AI.Controllers.Spell.CanCast((int)Spells.FrostStrike) && ME.HasAuraById((int)Auras.KillingM))
@@ -1150,11 +1272,38 @@ namespace Anthrax
 
         public override void OnLoad()   //This is called when the Customclass is loaded in SPQR
         {
+		try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(Settings));
+
+                using (StreamReader rd = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "\\Combats\\ADruid.xml"))
+                {
+                    CCSettings = xs.Deserialize(rd) as Settings;
+                }
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                if (CCSettings == null)
+                    CCSettings = new Settings();
+            }
             Logger.WriteLine("CustomClass " + Name + " Loaded");
         }
 
         public override void OnUnload() //This is called when the Customclass is unloaded in SPQR
         {
+		            try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(Settings));
+                using (StreamWriter wr = new StreamWriter(AppDomain.CurrentDomain.BaseDirectory + "\\Combats\\nrgdRET.xml"))
+                {
+                    xs.Serialize(wr, CCSettings);
+                }
+            }
+            catch { }
  
             Logger.WriteLine("CustomClass " + Name + " Unloaded, Goodbye !");
         }
@@ -1173,7 +1322,42 @@ namespace Anthrax
         {
             Logger.WriteLine("Stopping " + Name + " routine... gl smashing keys.");
         }
+		
+		public override object SettingsProperty
+        {
+            get
+            {
+                return CCSettings;
+            }
+        }
 
+		[Serializable]
+    public class Settings
+    {
+        public int Conversion = 80;
+
+		
+	//Healing Settings
+		[XmlIgnore]
+        [CategoryAttribute("Survival Settings"),
+        DisplayName("Conversion Hp Limit"), DefaultValueAttribute(80)]
+        public int _Conversion
+        {
+            get
+            {
+                return Conversion;
+            }
+            set
+            {
+                Conversion = value;
+            }
+        }
+
+
+	}
+		
+		
+		
 
     }
 }
