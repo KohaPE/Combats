@@ -80,6 +80,21 @@ namespace Anthrax
 			IncFandB = 114654,
 			FandBrim = 108683,
 			RainofFire = 104232,
+		//Affliction
+		    CreateHealthstone = 6201,
+			MaleficGrasp = 103103,			
+            Haunt = 48181,
+            DrainSoul = 1120,
+            Agony = 980,
+            UnstableAffliction = 30108,
+            DSMisery = 77801,			
+            UnendingResolve = 104773,
+			HealFunnel = 755,	
+			FelFlame = 77799,
+			Soulburn = 74434,
+			SoulSwapInh = 86121,
+			SoulSwapSB = 119678,
+			SoulSwapExh = 86213,
 			
 			
 			
@@ -91,7 +106,6 @@ namespace Anthrax
             GlyphofDH = 63303,
 			GlyphofHF = 56238,
 			DemoCheck = 124913,
-			CurseofElements = 1490,
 			ShadowFlame = 47960,
 			Corruption = 146739,
 			Doom = 603,
@@ -105,6 +119,20 @@ namespace Anthrax
 		FandBrim = 108683,
 		Immolate = 348,
 		ImmoFandB = 108686,
+		//Affliction
+		 Haunt = 48181,
+            Agony = 980,				
+            UnstableAffliction = 30108,
+			FireBreath = 34889,			// CoE equiv
+			LightningBreath = 24844,	// CoE equiv
+			MasterPoisoner = 93068,		// CoE equiv
+			CurseOfElements = 1490,		// CoE
+			Soulburn = 74434,
+			SoulSwapInh = 86211,
+			KC = 137587,
+			AffCheck = 108558,
+	     	
+			
 }
 
 #endregion
@@ -136,6 +164,16 @@ private int lastConFandBTick = 0;
 private int lastChaosBoltTick = 0;
 private int lastFandBTick = 0;
 private int lastIncTick = 0;
+public static int lastUnstableAffliction = 0;
+public static int lastHaunt = 0;
+public static int lastAgony = 0;
+public static int lastCorruption = 0;
+public static int lastMaleficGrasp = 0;
+public static int lastCoE = 0;
+public static int lastSB = 0;
+public static int lastSS = 0;
+public static int lastDrainSoul = 0;
+public static int lastLifeTap = 0;
 
 private void castNextSpellbySinglePriority(WowUnit TARGET)
 {
@@ -155,6 +193,8 @@ if (ME.HasAuraById((int)Auras.Meto) && !ME.InCombat && Environment.TickCount - l
 if (TARGET.Health >= 1 && ME.InCombat)
 { //Combat Check
 
+
+/////////////////////////////////////////////////////////////Destruction//////////////////////////////////////////////
 if (ME.HasAuraById((int)Auras.DestroCheck) && !IsCasting)
 { //Spec Check
 
@@ -249,8 +289,146 @@ if (ME.HasAuraById((int)Auras.DestroCheck) && !IsCasting)
 
 }
 
+/////////////////////////////////////////////////////////////Affliction//////////////////////////////////////////////
+if (ME.HasAuraById((int)Auras.AffCheck))
+{ //Spec Check
 
-											///////////////////////////Survival////////////////////////
+                if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.RainofFire)
+                         && !IsCasting)
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.RainofFire);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
+				
+	if(!ME.HasAuraById((int)Auras.CurseOfElements) &&
+					!ME.HasAuraById((int)Auras.FireBreath) && 
+					!ME.HasAuraById((int)Auras.LightningBreath) && 
+					!ME.HasAuraById((int)Auras.MasterPoisoner) &&
+					AI.Controllers.Spell.CanCast((int)Spells.CoE) &&
+					ME.Level > 92 &&
+					Environment.TickCount - lastCoE > 2000 )
+				{
+					WoW.Internals.ActionBar.ExecuteSpell((int)Spells.CoE);
+					lastCoE = Environment.TickCount;
+					return;
+				}
+
+	if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Mana) <= 70 && AI.Controllers.Spell.CanCast((int)Spells.LifeTap) && ME.HealthPercent >= 50)
+		{
+			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.LifeTap);
+			return;
+		}
+			
+			
+	if (Pet.HealthPercent <= 80 && AI.Controllers.Spell.CanCast((int)Spells.HealthFunnel) && Pet.IsAlive && TARGET.HasAuraById((int)Auras.Corruption))
+		{
+            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HealthFunnel);
+            return;
+        }
+		
+		
+	if (ME.HasAuraById((int)Auras.GlyphofHF) && Pet.HealthPercent <= 80 && AI.Controllers.Spell.CanCast((int)Spells.HealthFunnel) && Pet.IsAlive && TARGET.HasAuraById((int)Auras.Corruption))
+		{
+            WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HealthFunnel);
+            return;
+        }	
+
+                 // Drain Life
+                    if (ME.HealthPercent < 50 && AI.Controllers.Spell.CanCast((int)Spells.DrainLife) && (ObjectManager.LocalPlayer.MovementField.CurrentSpeed == 0))
+                    {
+ 						if (!ME.HasAuraById((int)Auras.Soulburn) &&
+							Shards > 0 )
+						{
+							WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Soulburn);
+						}
+						//AI.Controllers.Spell.Cast((int)Spells.DrainLife, unit);
+						WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DrainLife);
+                        return;
+                    }
+
+                
+		
+		
+		//Agony
+	if (!TARGET.HasAuraById((int)Auras.Agony) && Environment.TickCount - lastAgony > 1000 
+	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Agony 
+	&& x.TimeLeft < 4000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Agony) && TARGET.Auras.Where(x => x.SpellId == ((int)Auras.Agony) 
+	&& x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any() && Environment.TickCount - lastAgony > 1000)
+	        {
+			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Agony);
+			lastAgony = Environment.TickCount;
+			return;
+        }	
+
+		//Corrupton
+	if (!TARGET.HasAuraById((int)Auras.Corruption) 
+	&& Environment.TickCount - lastCorruption > 1000 
+	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Corruption && x.TimeLeft < 4000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Corruption) 
+	&& TARGET.Auras.Where(x => x.SpellId == ((int)Auras.Corruption) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any() && Environment.TickCount - lastCorruption > 1000)
+	        {
+			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Corruption);
+			lastCorruption = Environment.TickCount;
+			return;
+        }	
+		
+	
+	//Unstable Affliction
+	if (!TARGET.HasAuraById((int)Auras.UnstableAffliction) && Environment.TickCount - lastUnstableAffliction > 2000 && (ObjectManager.LocalPlayer.MovementField.CurrentSpeed == 0)
+	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.UnstableAffliction && x.TimeLeft <= 4000).Any()
+	&& TARGET.Auras.Where(x => x.SpellId == ((int)Auras.UnstableAffliction) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any() && Environment.TickCount - lastUnstableAffliction > 2000 
+	&& !(ObjectManager.LocalPlayer.MovementField.CurrentSpeed == 0))
+	        {
+			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.UnstableAffliction);
+			lastUnstableAffliction = Environment.TickCount;
+			return;
+        }		
+		
+	//Haunt
+	if (!TARGET.HasAuraById((int)Auras.Haunt) && Environment.TickCount - lastHaunt > 2000 && (ObjectManager.LocalPlayer.MovementField.CurrentSpeed == 0 && Shards > 0)
+	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Haunt && x.TimeLeft <= 4000).Any() 
+	&& TARGET.Auras.Where(x => x.SpellId == ((int)Auras.Haunt) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any() && Environment.TickCount - lastHaunt > 2000 
+	&& !(ObjectManager.LocalPlayer.MovementField.CurrentSpeed == 0) && Shards > 0)
+	        {
+			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Haunt);
+			lastHaunt = Environment.TickCount;
+			return;
+        }	
+		
+		//Drain Soul
+	if (ME.HealthPercent >= 20 && TARGET.Health <= 20 && AI.Controllers.Spell.CanCast((int)Spells.DrainSoul) && Environment.TickCount - lastDrainSoul > 300 && (ObjectManager.LocalPlayer.MovementField.CurrentSpeed == 0) && !IsCasting
+	|| ME.HealthPercent >= 20 && Shards < 1 && AI.Controllers.Spell.CanCast((int)Spells.DrainSoul) && Environment.TickCount - lastDrainSoul > 300 && (ObjectManager.LocalPlayer.MovementField.CurrentSpeed == 0) && !IsCasting)
+	        {
+			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DrainSoul);
+			lastMaleficGrasp = Environment.TickCount;
+			return;
+        }	
+	
+	//Malefic Grasp
+	if (ME.HealthPercent >= 20 && AI.Controllers.Spell.CanCast((int)Spells.MaleficGrasp) && Environment.TickCount - lastMaleficGrasp > 300 && (ObjectManager.LocalPlayer.MovementField.CurrentSpeed == 0) && !IsCasting
+	|| ME.HasAuraById((int)Auras.KC) && ME.HealthPercent >= 20 && AI.Controllers.Spell.CanCast((int)Spells.MaleficGrasp) && Environment.TickCount - lastMaleficGrasp > 300 && !IsCasting)
+	        {
+			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.MaleficGrasp);
+			lastMaleficGrasp = Environment.TickCount;
+			return;
+        }	
+		
+
+
+
+}
+
+
+											//////////////////////////////////////////////////////////Demonology////////////////////////////////////////////////////////
 if (ME.HasAuraById((int)Auras.DemoCheck) && !IsCasting)
 { //Spec Check
 
@@ -278,7 +456,7 @@ if (ME.HasAuraById((int)Auras.DemoCheck) && !IsCasting)
             return;
         }	
 			
-	if (!TARGET.HasAuraById((int)Auras.CurseofElements) && AI.Controllers.Spell.CanCast((int)Spells.CoE))		
+	if (!TARGET.HasAuraById((int)Auras.CurseOfElements) && AI.Controllers.Spell.CanCast((int)Spells.CoE))		
 		{
             WoW.Internals.ActionBar.ExecuteSpell((int)Spells.CoE);
             return;
@@ -551,7 +729,7 @@ if (ME.HasAuraById((int)Auras.DemoCheck))
             return;
         }
 			
-	if (!TARGET.HasAuraById((int)Auras.CurseofElements) && AI.Controllers.Spell.CanCast((int)Spells.CoE))		
+	if (!TARGET.HasAuraById((int)Auras.CurseOfElements) && AI.Controllers.Spell.CanCast((int)Spells.CoE))		
 		{
             WoW.Internals.ActionBar.ExecuteSpell((int)Spells.CoE);
             return;

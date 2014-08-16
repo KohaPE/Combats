@@ -194,7 +194,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 			return;
         }
 		
-	if (ME.HasAuraById((int)Auras.GlyphofS) && TARGET.Position.Distance3DFromPlayer < 15 && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && !ME.HasAuraById((int)Auras.SavageRoar)
+	if (ME.HasAuraById((int)Auras.GlyphofS) && TARGET.Position.Distance3DFromPlayer < 20 && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && !ME.HasAuraById((int)Auras.SavageRoar)
 	&& ME.HasAuraById((int)Auras.CatForm))
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageRoar);

@@ -220,6 +220,9 @@ public override void OnPull(WoW.Classes.ObjectManager.WowUnit unit)
 //public override void OnCombat(WoW.Classes.ObjectManager.WowUnit unit)
 //{}
 
+private int lastSSTick = 0;
+private int lastCSTick = 0;
+
 private void castNextSpellbySinglePriority(WowUnit TARGET)
 {
 
@@ -264,12 +267,10 @@ if (ME.HasAuraById((int)Auras.BMCheck))
             return;
         }
 		
-//	if (Anthrax.WoW.Classes.ObjectManager.WowLocalPlayer.UnitsAttackingMe > 0 && Anthrax.WoW.Classes.ObjectManager.WowUnit.GetThreatEntry(Anthrax.WoW.Classes.ObjectManager.WowUnit) > 90
-//	&& !ME.HasAuraById((int)Auras.Misdirection))
-			
+//	if (ME.UnitsAttackingMe >= 1 && !ME.HasAuraById((int)Auras.Misdirection) && AI.Controllers.Spell.CanCast((int)Spells.Misdirect))
 //			{
- //               WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Misdirect);
-  //              return;
+//               Anthrax.WoW.Internals.Chat.SendMessage("/click BT4Button9");
+//               return;
 //            }
 		
 	if (ME.HasAuraById((int)Auras.T162P) && AI.Controllers.Spell.CanCast((int)Spells.RapidFire))
@@ -277,7 +278,7 @@ if (ME.HasAuraById((int)Auras.BMCheck))
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.RapidFire);
                 return;
             }
-	if (TARGET.MaxHealth >= 3000000 && AI.Controllers.Spell.CanCast((int)Spells.Stampede))
+	if (TARGET.MaxHealth >= 30000000 && AI.Controllers.Spell.CanCast((int)Spells.Stampede))
 			{
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Stampede);
                 return;
@@ -289,9 +290,10 @@ if (ME.HasAuraById((int)Auras.BMCheck))
                 return;
             }
 			//Serpent Sting
-		if(!TARGET.HasAuraById((int)Auras.SerpentSting) && AI.Controllers.Spell.CanCast((int)Spells.SerpentSting))
+		if(!TARGET.HasAuraById((int)Auras.SerpentSting) && AI.Controllers.Spell.CanCast((int)Spells.SerpentSting) && Environment.TickCount - lastSSTick > 2000)
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SerpentSting);
+				lastSSTick = Environment.TickCount;
                 return;
             }	
 			
@@ -331,17 +333,19 @@ if (ME.HasAuraById((int)Auras.BMCheck))
             }
 				
 			
-		//Arcane Shot Capp
-		if(Focus > 40 && AI.Controllers.Spell.CanCast((int)Spells.ArcaneShot))
+		//Arcane Shot
+		if(AI.Controllers.Spell.CanCast((int)Spells.ArcaneShot) && !AI.Controllers.Spell.CanCast((int)Spells.AMurderOfCrows) && !AI.Controllers.Spell.CanCast((int)Spells.KillCommand)
+		&& !AI.Controllers.Spell.CanCast((int)Spells.DireBeast) && !AI.Controllers.Spell.CanCast((int)Spells.GlaiveToss) && Focus > 35)
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ArcaneShot);
                 return;
             }
 			
 				//CobraShot
-		if(Focus <= 60 && AI.Controllers.Spell.CanCast((int)Spells.CobraShot))
+		if(Focus <= 40 && AI.Controllers.Spell.CanCast((int)Spells.CobraShot) && Environment.TickCount - lastCSTick > 1800)
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.CobraShot);
+				lastCSTick = Environment.TickCount;
                 return;
             }
 
@@ -387,7 +391,7 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
                 return;
             }
 			
-	if (TARGET.MaxHealth >= 3000000 && AI.Controllers.Spell.CanCast((int)Spells.Stampede))
+	if (TARGET.MaxHealth >= 30000000 && AI.Controllers.Spell.CanCast((int)Spells.Stampede))
 			{
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Stampede);
                 return;
@@ -398,12 +402,13 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.AMurderOfCrows);
                 return;
             }
-		//Serpent Sting
-		if(!TARGET.HasAuraById((int)Auras.SerpentSting) && AI.Controllers.Spell.CanCast((int)Spells.SerpentSting))
+			//Serpent Sting
+		if(!TARGET.HasAuraById((int)Auras.SerpentSting) && AI.Controllers.Spell.CanCast((int)Spells.SerpentSting) && Environment.TickCount - lastSSTick > 2000)
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SerpentSting);
+				lastSSTick = Environment.TickCount;
                 return;
-            }
+            }	
 			
 		//Arcane Shot Capp
 		if(Focus >= 90 && AI.Controllers.Spell.CanCast((int)Spells.ArcaneShot))
@@ -453,9 +458,10 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
             }
 			
 		//CobraShot
-		if(Focus <= 60 && AI.Controllers.Spell.CanCast((int)Spells.CobraShot))
+		if(Focus <= 60 && AI.Controllers.Spell.CanCast((int)Spells.CobraShot) && Environment.TickCount - lastCSTick > 1700)
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.CobraShot);
+				lastCSTick = Environment.TickCount;
                 return;
             }		
 	
@@ -531,20 +537,35 @@ if (ME.HasAuraById((int)Auras.BMCheck))
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.GlaiveToss);
                 return;
             }
+			
+					//KillShot
+		if(TARGET.HealthPercent < 20 && AI.Controllers.Spell.CanCast((int)Spells.KillShot))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.KillShot);
+                return;
+            }
 				//Dire Beast
 		if(AI.Controllers.Spell.CanCast((int)Spells.DireBeast))
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DireBeast);
                 return;
             }
+			
+		//Focus Fire
+		if(!ME.HasAuraById((int)Auras.FocusFire) && AI.Controllers.Spell.CanCast((int)Spells.FocusFire) && ME.Auras.Where(x => x.SpellId == (int)Auras.Frenzy && x.StackCount >= 5).Any())
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FocusFire);
+                return;
+            }
 
 			
 		//CobraShot
-		if(Focus <= 20 && AI.Controllers.Spell.CanCast((int)Spells.CobraShot))
+		if(Focus <= 60 && AI.Controllers.Spell.CanCast((int)Spells.CobraShot) && Environment.TickCount - lastCSTick > 1700)
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.CobraShot);
+				lastCSTick = Environment.TickCount;
                 return;
-            }		
+            }			
 	
 
 	
@@ -610,6 +631,12 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.GlaiveToss);
                 return;
             }
+		//KillShot
+		if(TARGET.HealthPercent < 20 && AI.Controllers.Spell.CanCast((int)Spells.KillShot))
+		    {
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.KillShot);
+                return;
+            }
 				//Dire Beast
 		if(AI.Controllers.Spell.CanCast((int)Spells.DireBeast))
 		    {
@@ -619,11 +646,12 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
 
 			
 		//CobraShot
-		if(Focus <= 60 && AI.Controllers.Spell.CanCast((int)Spells.CobraShot))
+		if(Focus <= 60 && AI.Controllers.Spell.CanCast((int)Spells.CobraShot) && Environment.TickCount - lastCSTick > 1700)
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.CobraShot);
+				lastCSTick = Environment.TickCount;
                 return;
-            }		
+            }			
 	
 
 	
