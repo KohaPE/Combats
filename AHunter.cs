@@ -201,6 +201,7 @@ public bool CallPet()
             }
 
         }
+		
 
 		
 public override void OnPatrol()
@@ -222,6 +223,8 @@ public override void OnPull(WoW.Classes.ObjectManager.WowUnit unit)
 
 private int lastSSTick = 0;
 private int lastCSTick = 0;
+private int lastMDTick = 0;
+
 
 private void castNextSpellbySinglePriority(WowUnit TARGET)
 {
@@ -232,6 +235,14 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 
 if (TARGET.Health >= 1 && ME.InCombat && !IsCasting)
 { //Combat Check
+
+if (ME.UnitsAttackingMe.Count >= 1 && AI.Controllers.Spell.CanCast((int)Spells.Misdirect) && !ME.HasAuraById((int)Auras.Misdirection) && Environment.TickCount - lastMDTick > 2000)
+	{
+              Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
+			  Logger.WriteLine("Casting Misdirect!!!");
+			  lastMDTick = Environment.TickCount;
+              return;
+          }
 
 												///////////////////////////Beast Master////////////////////
 if (ME.HasAuraById((int)Auras.BMCheck))
@@ -272,6 +283,7 @@ if (ME.HasAuraById((int)Auras.BMCheck))
 //               Anthrax.WoW.Internals.Chat.SendMessage("/click BT4Button9");
 //               return;
 //            }
+
 		
 	if (ME.HasAuraById((int)Auras.T162P) && AI.Controllers.Spell.CanCast((int)Spells.RapidFire))
 		    {
@@ -384,6 +396,17 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
             WoW.Internals.ActionBar.ExecuteSpell((int)Spells.MendPet);
             return;
         }
+		
+
+		
+		
+if (ME.UnitsAttackingMe.Count >= 1 && AI.Controllers.Spell.CanCast((int)Spells.Misdirect) && !ME.HasAuraById((int)Auras.Misdirection) && Environment.TickCount - lastMDTick > 2000)
+	{
+              Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
+			  Logger.WriteLine("Casting Misdirect!!!");
+			  lastMDTick = Environment.TickCount;
+              return;
+          }
 			
 		if (ME.HasAuraById((int)Auras.T162P) && AI.Controllers.Spell.CanCast((int)Spells.RapidFire))
 		    {
@@ -481,6 +504,14 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
 		
 	if (TARGET.Health >= 1 && ME.InCombat && !IsCasting)
 { //Combat Check
+
+if (ME.UnitsAttackingMe.Count >= 1 && AI.Controllers.Spell.CanCast((int)Spells.Misdirect) && !ME.HasAuraById((int)Auras.Misdirection) && Environment.TickCount - lastMDTick > 2000)
+	{
+              Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
+			  Logger.WriteLine("Casting Misdirect!!!");
+			  lastMDTick = Environment.TickCount;
+              return;
+          }
 
 													///////////////////////////Beast Master////////////////////////
 if (ME.HasAuraById((int)Auras.BMCheck))

@@ -364,7 +364,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 
 			
 		//Thrash Debuff
-			if (AI.Controllers.Spell.CanCast((int)Spells.Thrash) && TARGET.Position.Distance3DFromPlayer < 8)
+			if (AI.Controllers.Spell.CanCast((int)Spells.Thrash) && !AI.Controllers.Spell.CanCast((int)Spells.Lacerate) && !AI.Controllers.Spell.CanCast((int)Spells.MangleBear))
 			{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Thrash);
 				return;

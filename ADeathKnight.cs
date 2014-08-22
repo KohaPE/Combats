@@ -171,6 +171,23 @@ namespace Anthrax
 				lastConversionTick = Environment.TickCount;
                 return;
             }
+			
+				///Death and Decay on Alt Press
+		if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.DnD))
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.DnD);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
 
 
 		//Rotation
@@ -221,8 +238,10 @@ namespace Anthrax
 				
 		//Dots//
 		
-		if (!TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike)
-		|| TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft <= 3000).Any() )
+		if (!TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike) 
+		&& !TARGET.Auras.Where(x => x.SpellId == ((int)Auras.BloodPlague) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any()
+		|| TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft <= 3000).Any() 
+		&& TARGET.Auras.Where(x => x.SpellId == ((int)Auras.BloodPlague) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any())
 			{
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
                 return;
@@ -281,9 +300,12 @@ namespace Anthrax
                 }
 
 		//Festering Strike if less the 90 Runic Power
-		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) < 90 && AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike)
+		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) < 90 && AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike) 
+		&& TARGET.Auras.Where(x => x.SpellId == ((int)Auras.BloodPlague) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any()
 		|| AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft <= 20000).Any()
-		|| AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft <= 20000).Any() )
+		&& TARGET.Auras.Where(x => x.SpellId == ((int)Auras.BloodPlague) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any()
+		|| AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft <= 20000).Any() 
+		&& TARGET.Auras.Where(x => x.SpellId == ((int)Auras.FrostFever) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any())
                 {
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FesteringStrike);
                     return;
@@ -389,14 +411,15 @@ namespace Anthrax
 
                 // Deseases
 				
-				if (!TARGET.HasAuraById((int)Auras.FrostFever) &&
-                            AI.Controllers.Spell.CanCast((int)Spells.IcyTouch))
+				if (!TARGET.HasAuraById((int)Auras.FrostFever) && AI.Controllers.Spell.CanCast((int)Spells.IcyTouch) 
+				&& !TARGET.Auras.Where(x => x.SpellId == ((int)Auras.FrostFever) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any())
                         {
                             WoW.Internals.ActionBar.ExecuteSpell((int)Spells.IcyTouch);
                             return;
                         }
-                 if (!TARGET.HasAuraById((int)Auras.BloodPlague) &&
-                            AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike))
+                 if (!TARGET.HasAuraById((int)Auras.BloodPlague) 
+				 && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike)
+				 && !TARGET.Auras.Where(x => x.SpellId == ((int)Auras.BloodPlague) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any())
                         {
                             WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
                             return;
@@ -408,9 +431,9 @@ namespace Anthrax
                     return;
 				}
 				
-                if ((TARGET.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft < 8000).Any() ||
-                   TARGET.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft < 8000).Any()) &&
-                    AI.Controllers.Spell.CanCast((int)Spells.BloodBoil)
+                if ((TARGET.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft < 8000).Any() && TARGET.Auras.Where(x => x.SpellId == ((int)Auras.FrostFever) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any()
+				|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft < 8000).Any()) && AI.Controllers.Spell.CanCast((int)Spells.BloodBoil)
+				&& TARGET.Auras.Where(x => x.SpellId == ((int)Auras.BloodPlague) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any()
 				|| ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Blood) >= 2 && ME.UnitsAttackingMe.Count > 1 && TARGET.HasAuraById((int)Auras.BloodPlague))
                 {
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodBoil);
@@ -1019,14 +1042,15 @@ namespace Anthrax
 
                 // Deseases
 				
-			if (!TARGET.HasAuraById((int)Auras.FrostFever) &&
-                            AI.Controllers.Spell.CanCast((int)Spells.IcyTouch))
+				if (!TARGET.HasAuraById((int)Auras.FrostFever) && AI.Controllers.Spell.CanCast((int)Spells.IcyTouch) 
+				&& !TARGET.Auras.Where(x => x.SpellId == ((int)Auras.FrostFever) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any())
                         {
                             WoW.Internals.ActionBar.ExecuteSpell((int)Spells.IcyTouch);
                             return;
                         }
-                 if (!TARGET.HasAuraById((int)Auras.BloodPlague) &&
-                            AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike))
+                 if (!TARGET.HasAuraById((int)Auras.BloodPlague) 
+				 && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike)
+				 && !TARGET.Auras.Where(x => x.SpellId == ((int)Auras.BloodPlague) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any())
                         {
                             WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
                             return;
@@ -1040,9 +1064,10 @@ namespace Anthrax
 				
 				if (TARGET.Position.Distance3DFromPlayer <= 15)
 				{
-                if ((TARGET.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft < 8000).Any() ||
-                   TARGET.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft < 8000).Any()) &&
-                    AI.Controllers.Spell.CanCast((int)Spells.BloodBoil)
+				
+                if ((TARGET.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft < 8000).Any() && TARGET.Auras.Where(x => x.SpellId == ((int)Auras.FrostFever) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any()
+				|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft < 8000).Any()) && AI.Controllers.Spell.CanCast((int)Spells.BloodBoil)
+				&& TARGET.Auras.Where(x => x.SpellId == ((int)Auras.BloodPlague) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any()
 				|| ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Blood) >= 2 && ME.UnitsAttackingMe.Count > 1 && TARGET.HasAuraById((int)Auras.BloodPlague))
                 {
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.BloodBoil);

@@ -206,6 +206,7 @@ if (ME.HasAuraById((int)Auras.RestoCheck))
 }
 
 
+
 if (TARGET.Health >= 1 && ME.InCombat)
 { //Combat Check
 
@@ -585,7 +586,7 @@ if (ME.HasAuraById((int)Auras.EleCheck))
 				flag=true;
 			}
 		
-	
+			
 	
 	
 				if (AI.Controllers.Spell.CanCast((int)Spells.LavaBurst) && ME.HasAuraById((int)Auras.LavaS))
@@ -792,8 +793,27 @@ if (ME.HasAuraById((int)Auras.EnhanceCheck))
 
     }
 
-	
-	        public bool FireTotemActive()
+
+        public override void OnCombat(WowUnit TARGET)
+        {
+            /* Performance tests
+            stopwatch.Stop();
+            averageScanTimes.Add(stopwatch.ElapsedMilliseconds);
+            SPQR.Logger.WriteLine("Elapsed:  " + stopwatch.ElapsedMilliseconds.ToString() + " miliseconds, average:" + (averageScanTimes.Sum() / averageScanTimes.Count()).ToString() + ",Max:" + averageScanTimes.Max());
+            stopwatch.Restart();
+             */
+            if (!Cooldown.IsGlobalCooldownActive)
+            {
+                if (isAOE) { castNextSpellbyAOEPriority(TARGET); } else { castNextSpellbySinglePriority(TARGET); }
+            }
+            if ((GetAsyncKeyState(90) == -32767))
+            {
+                changeRotation();
+            }	
+        }
+		
+		
+		public bool FireTotemActive()
         {
             WoW.Classes.Frames.WowFrame totemFrame = WoW.Internals.UIFrame.GetFrameByName("TotemFrameTotem1");
 
@@ -853,24 +873,7 @@ if (ME.HasAuraById((int)Auras.EnhanceCheck))
 
             return totemFrame.IsVisible && totemFrame.IsValid;
         }
-
-        public override void OnCombat(WowUnit TARGET)
-        {
-            /* Performance tests
-            stopwatch.Stop();
-            averageScanTimes.Add(stopwatch.ElapsedMilliseconds);
-            SPQR.Logger.WriteLine("Elapsed:  " + stopwatch.ElapsedMilliseconds.ToString() + " miliseconds, average:" + (averageScanTimes.Sum() / averageScanTimes.Count()).ToString() + ",Max:" + averageScanTimes.Max());
-            stopwatch.Restart();
-             */
-            if (!Cooldown.IsGlobalCooldownActive)
-            {
-                if (isAOE) { castNextSpellbyAOEPriority(TARGET); } else { castNextSpellbySinglePriority(TARGET); }
-            }
-            if ((GetAsyncKeyState(90) == -32767))
-            {
-                changeRotation();
-            }	
-        }
+		
 
         public override void OnLoad()   //This is called when the Customclass is loaded in SPQR
         {
