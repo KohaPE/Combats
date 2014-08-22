@@ -236,7 +236,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 if (TARGET.Health >= 1 && ME.InCombat && !IsCasting)
 { //Combat Check
 
-if (ME.UnitsAttackingMe.Count >= 1 && AI.Controllers.Spell.CanCast((int)Spells.Misdirect) && !ME.HasAuraById((int)Auras.Misdirection) && Environment.TickCount - lastMDTick > 2000 && PET.Health >= 1)
+if (ME.UnitsAttackingMe.Count >= 1 && AI.Controllers.Spell.CanCast((int)Spells.Misdirect) && !ME.HasAuraById((int)Auras.Misdirection) && Environment.TickCount - lastMDTick > 2000 && Pet.Health >= 1)
 	{
               Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
 			  Logger.WriteLine("Casting Misdirect!!!");
@@ -496,7 +496,7 @@ if (ME.HasAuraById((int)Auras.SurvivalCheck))
 	if (TARGET.Health >= 1 && ME.InCombat && !IsCasting)
 { //Combat Check
 
-if (ME.UnitsAttackingMe.Count >= 1 && AI.Controllers.Spell.CanCast((int)Spells.Misdirect) && !ME.HasAuraById((int)Auras.Misdirection) && Environment.TickCount - lastMDTick > 2000 && PET.Health >= 1)
+if (ME.UnitsAttackingMe.Count >= 1 && AI.Controllers.Spell.CanCast((int)Spells.Misdirect) && !ME.HasAuraById((int)Auras.Misdirection) && Environment.TickCount - lastMDTick > 2000 && Pet.Health >= 1)
 	{
               Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
 			  Logger.WriteLine("Casting Misdirect!!!");
