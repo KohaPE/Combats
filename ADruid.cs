@@ -156,6 +156,7 @@ namespace Anthrax
 			GlyphofShred = 114235,
 			Vis = 148903,
 			ReOrign = 139120,
+			WA = 113746,
 }
 #endregion
 
@@ -323,7 +324,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 				return;
 			}
 	
-		if (MyRage < CCSettings.Enrage && AI.Controllers.Spell.CanCast((int)Spells.Enrage))
+		if (MyRage < CCSettings.Enrage && AI.Controllers.Spell.CanCast((int)Spells.Enrage) && !ME.HasAuraById((int)Auras.CatForm))
 			{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Enrage);
 				return;
@@ -634,6 +635,13 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
         }	
 		
 	}
+	
+	//Faerie Fire
+	
+	if (!TARGET.HasAuraById((int)Auras.WA) && AI.Controllers.Spell.CanCast((int)Spells.FF) && !ME.HasAuraById((int)Auras.Prowl))
+		{
+		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FF);
+		}
  
 //Savage Roar if buff less then 3secs and Dosent Exist
  
@@ -696,7 +704,6 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		{
 		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.TigerFury);
 		}
-		
 		
 		
 	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.MangleFeral) && MyEnergy >= 40)
