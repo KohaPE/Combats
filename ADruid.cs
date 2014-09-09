@@ -771,9 +771,14 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		{
 		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.TigerFury);
 		}
+	
+	if (WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target) && ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.Shred) && MyEnergy >= 40 && TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rake && x.TimeLeft >= 5000).Any())
+		{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Shred);
+                    return;
+        }	
 		
-		
-	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.MangleFeral) && MyEnergy >= 40 && TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rake && x.TimeLeft >= 5000).Any())
+	if (!WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target) && ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.MangleFeral) && MyEnergy >= 40 && TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rake && x.TimeLeft >= 5000).Any())
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.MangleFeral);
                     return;
