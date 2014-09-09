@@ -104,6 +104,7 @@ namespace Anthrax
 			MotW = 1126,
 			CWard = 102351,
 			Berserk = 106951,
+			Growl = 6795,
         }
 
         internal enum Auras : int                       //This is another convenient list of Auras used in our combat routine
@@ -157,6 +158,40 @@ namespace Anthrax
 			Vis = 148903,
 			ReOrign = 139120,
 			WA = 113746,
+			
+					//5.3 Raids
+		FengTheAccursed = 131792,
+		BladeLord = 123474,
+		GrandEmpress = 123707,
+		Tsulong = 122752,
+		LeiShi = 123121,
+		
+		//5.4 Raids
+		Jinrokh = 138349,
+		JiKun = 134366,
+		Durumu = 133767,
+		Primordius = 136050,
+		IronQon = 134691,
+		TwinConsorts = 137408,
+		LeiShen = 134912,
+		LeiShen2 = 134916,
+		LeiShen3 = 136478,
+		LieShen4 = 136913,
+		
+		//SoO Raids
+		Immerseus = 71543,
+		Norushen = 146124,
+		ShaofPride = 144358,
+		IronJuggernaut = 144467,
+		DarkShamens = 144215,
+		Nazgrim = 143494,
+		Malkorok = 142990,
+		BlackFuse = 143385,
+		Thok = 143426,
+		Thok2 = 143780,
+		Thok3 = 143773,
+		Garrosh = 145183,
+		Garrosh2 = 145195,
 }
 #endregion
 
@@ -241,6 +276,9 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	
 	
 	}
+	
+
+		
 
 	if (!ME.HasAuraById((int)Auras.Prowl))
 	{
@@ -297,6 +335,51 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 					/////////////////////////////Bear Form///////////////////////////////
 	if (ME.HasAuraById((int)Auras.TankCheck))
 	{
+	
+				//Auto Taunt Code
+		//5.3 Raids
+
+		
+		if (AI.Controllers.Spell.CanCast((int)Spells.Growl) && ME.HasAuraById((int)Auras.TankCheck))
+		{
+			if (!ME.HasAuraById((int)Auras.FengTheAccursed) && TARGET.Name == "Feng the Accursed"
+			|| TARGET.Name == "Raider's Training Dummy"
+			|| !ME.HasAuraById((int)Auras.BladeLord) && TARGET.Name == "Blade Lord Ta'yak"
+			|| !ME.HasAuraById((int)Auras.GrandEmpress) && TARGET.Name == "Grand Empress Shek'zeer"
+			|| !ME.HasAuraById((int)Auras.Tsulong) && TARGET.Name == "Tsulong"
+			|| !ME.HasAuraById((int)Auras.LeiShi) && TARGET.Name == "Lei Shi"
+		//5.4
+			|| !ME.HasAuraById((int)Auras.Jinrokh) && TARGET.Name == "Jin'rokh the Breaker"
+			|| !ME.HasAuraById((int)Auras.JiKun) && TARGET.Name == "Ji-Kun"
+			|| !ME.HasAuraById((int)Auras.Durumu) && TARGET.Name == "Durumu the Forgotten"
+			|| !ME.HasAuraById((int)Auras.Primordius) && TARGET.Name == "Primordius"
+			|| !ME.HasAuraById((int)Auras.IronQon) && TARGET.Name == "Iron Qon"
+			|| !ME.HasAuraById((int)Auras.TwinConsorts) && TARGET.Name == "Suen"
+			|| !ME.HasAuraById((int)Auras.LeiShen) && TARGET.Name == "Lei Shen"
+			|| !ME.HasAuraById((int)Auras.LeiShen2) && TARGET.Name == "Lei Shen"
+			|| !ME.HasAuraById((int)Auras.LeiShen3) && TARGET.Name == "Lei Shen"
+			|| !ME.HasAuraById((int)Auras.LieShen4) && TARGET.Name == "Lei Shen"
+		//SoO
+			|| !ME.HasAuraById((int)Auras.Immerseus) && TARGET.Name == "Immerseus"
+			|| !ME.HasAuraById((int)Auras.Norushen) && TARGET.Name == "Norushen"
+			|| !ME.HasAuraById((int)Auras.ShaofPride) && TARGET.Name == "Sha of Pride"
+			|| !ME.HasAuraById((int)Auras.IronJuggernaut) && TARGET.Name == "Iron Juggernaut"
+			|| !ME.HasAuraById((int)Auras.DarkShamens) && TARGET.Name == "Earthbreaker Haromm"
+			|| !ME.HasAuraById((int)Auras.DarkShamens) && TARGET.Name == "Wavebinder Kardris"
+			|| !ME.HasAuraById((int)Auras.Nazgrim) && TARGET.Name == "General Nazgrim"
+			|| !ME.HasAuraById((int)Auras.Malkorok) && TARGET.Name == "Malkorok"
+			|| !ME.HasAuraById((int)Auras.BlackFuse) && TARGET.Name == "Siegecrafter Blackfuse"
+			|| !ME.HasAuraById((int)Auras.Thok) && TARGET.Name == "Thok the Bloodthirsty"
+			|| !ME.HasAuraById((int)Auras.Thok2) && TARGET.Name == "Thok the Bloodthirsty"
+			|| !ME.HasAuraById((int)Auras.Thok3) && TARGET.Name == "Thok the Bloodthirsty"
+			|| !ME.HasAuraById((int)Auras.Garrosh) && TARGET.Name == "Garrosh Hellscream"
+			|| !ME.HasAuraById((int)Auras.Garrosh2) && TARGET.Name == "Garrosh Hellscream"
+			)
+			{
+			  WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Growl);
+			  Logger.WriteLine("Auto Taunting!!!");
+			}
+		}
 	//Healing & Survival
 	{
 		if (ME.HealthPercent < CCSettings.CWard && AI.Controllers.Spell.CanCast((int)Spells.CWard) && !ME.HasAuraById((int)Auras.CWard))
@@ -613,28 +696,12 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
  
 //Proc Dearm of Cenarious @ 4+ Combo Points or when Preadatory Swiftness is about to expire.
 
- 		if (ME.HasAuraById((int)Auras.PredSwiftness) && AI.Controllers.Spell.CanCast((int)Spells.HealingTouch))
+ 		if (ME.HasAuraById((int)Auras.PredSwiftness) && AI.Controllers.Spell.CanCast((int)Spells.HealingTouch) && ME.ComboPoints >= 4
+		|| ME.HasAuraById((int)Auras.PredSwiftness) && AI.Controllers.Spell.CanCast((int)Spells.HealingTouch) && ME.Auras.Where(x => x.SpellId == (int)Auras.PredSwiftness && x.TimeLeft < 2000).Any())
 		{
 		WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HealingTouch);
 		}
 		
-	//Re-Origin Code
-	
-	if (ME.HasAuraById((int)Auras.ReOrign))
-	{
-		if (ME.ComboPoints >= 5 && AI.Controllers.Spell.CanCast((int)Spells.Rip))
-				{
-                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rip);
-                    return;
-        }
-		
-	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.Rake))
-				{
-                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rake);
-                    return;
-        }	
-		
-	}
 	
 	//Faerie Fire
 	
@@ -685,7 +752,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	if (!(TARGET.Auras.Where(x => x.SpellId == ((int)Auras.Rake) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any() ) && AI.Controllers.Spell.CanCast((int)Spells.Rake) && ME.ComboPoints < 4
 	|| TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rake && x.TimeLeft < 5000).Any() && AI.Controllers.Spell.CanCast((int)Spells.Rake) && ME.ComboPoints < 4
 	&& (TARGET.Auras.Where(x => x.SpellId == ((int)Auras.Rake) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any() )
-	//|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount <= 2).Any() && ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.Rake)
+	|| ME.HasAuraById((int)Auras.DoC) && ME.Auras.Where(x => x.SpellId == (int)Auras.DoC && x.StackCount <= 2).Any() && ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.Rake)
 	|| ME.HasAuraById((int)Auras.Vis) && AI.Controllers.Spell.CanCast((int)Spells.Rake) && ME.ComboPoints < 4)
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Rake);
@@ -706,7 +773,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		}
 		
 		
-	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.MangleFeral) && MyEnergy >= 40)
+	if (ME.ComboPoints < 5 && AI.Controllers.Spell.CanCast((int)Spells.MangleFeral) && MyEnergy >= 40 && TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rake && x.TimeLeft >= 5000).Any())
 		{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.MangleFeral);
                     return;
@@ -786,6 +853,31 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 
 		var MyRage = ObjectManager.LocalPlayer.GetPower(WoW.Classes.ObjectManager.WowUnit.WowPowerType.Rage);
 		var MyEnergy = ObjectManager.LocalPlayer.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.Energy);
+		
+		if (!ME.InCombat && !ME.HasAuraById((int)Auras.Prowl) && Environment.TickCount - lastStealthTick > 2000 && ME.HasAuraById((int)Auras.FeralCheck) && !ObjectManager.LocalPlayer.IsMounted && !ME.HasAuraById((int)Auras.FForm))
+         {
+			WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Prowl);
+			lastStealthTick = Environment.TickCount;
+			return;
+        }
+		
+	if (ME.HasAuraById((int)Auras.GlyphofS) && TARGET.Position.Distance3DFromPlayer < 20 && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && !ME.HasAuraById((int)Auras.SavageRoar)
+	&& ME.HasAuraById((int)Auras.CatForm))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageRoar);
+                    return;
+			}
+	if (AI.Controllers.Spell.CanCast((int)Spells.Pounce) && !WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target) && TARGET.Position.Distance3DFromPlayer < 8)
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Pounce);
+                    return;
+			}	
+	
+	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage) && WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target) && TARGET.Position.Distance3DFromPlayer < 8)
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Ravage);
+                    return;
+			}
 		
 	if (TARGET.Health >= 1 && ME.InCombat)
 	{
@@ -1015,6 +1107,23 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	
 	if (ME.HasAuraById((int)Auras.FeralCheck))
 	{
+	
+if (ME.HasAuraById((int)Auras.Prowl))
+	{
+
+
+	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage) && WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Ravage);
+                    return;
+			}	
+			
+		if (AI.Controllers.Spell.CanCast((int)Spells.Pounce))
+			{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Pounce);
+                    return;
+			}	
+	}
 	
 	if (ME.HasAuraById((int)Auras.GlyphofS) && !ME.HasAuraById((int)Auras.SavageRoar) && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar))
 			{
