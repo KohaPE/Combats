@@ -240,10 +240,16 @@ namespace Anthrax
                 }
 				
 		//Dots//
+		if (TARGET.Auras.Where(x => x.SpellId == ((int)Auras.BloodPlague) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any() 
+		&& AI.Controllers.Spell.CanCast((int)Spells.Outbreak) && TARGET.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft <= 6000).Any())
+			{
+                WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Outbreak);
+                return;
+            }		
 		
 		if (!TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike) 
 		&& !TARGET.Auras.Where(x => x.SpellId == ((int)Auras.BloodPlague) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any()
-		|| TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft <= 3000).Any() 
+		|| TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike) && TARGET.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft <= 3000).Any() 
 		&& TARGET.Auras.Where(x => x.SpellId == ((int)Auras.BloodPlague) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any())
 			{
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
@@ -295,8 +301,9 @@ namespace Anthrax
 
 		//Scourge Strike if less then 90 runic power
 		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) < 90 &&
-                    AI.Controllers.Spell.CanCast((int)Spells.ScourgeStrike) && TARGET.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft >= 30000).Any()
-		|| ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) >= 2 && AI.Controllers.Spell.CanCast((int)Spells.ScourgeStrike))
+                    AI.Controllers.Spell.CanCast((int)Spells.ScourgeStrike) && TARGET.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft >= 3000).Any()
+		|| ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) >= 2 && AI.Controllers.Spell.CanCast((int)Spells.ScourgeStrike)
+		|| ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Death) >= 1)
                 {
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.ScourgeStrike);
                     return;
@@ -304,11 +311,9 @@ namespace Anthrax
 
 		//Festering Strike if less the 90 Runic Power
 		if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) < 90 && AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike) 
-		&& TARGET.Auras.Where(x => x.SpellId == ((int)Auras.BloodPlague) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any()
-		|| AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft <= 20000).Any()
-		&& TARGET.Auras.Where(x => x.SpellId == ((int)Auras.BloodPlague) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any()
-		|| AI.Controllers.Spell.CanCast((int)Spells.FesteringStrike) && ME.Auras.Where(x => x.SpellId == (int)Auras.FrostFever && x.TimeLeft <= 20000).Any() 
-		&& TARGET.Auras.Where(x => x.SpellId == ((int)Auras.FrostFever) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any())
+		&& TARGET.Auras.Where(x => x.SpellId == ((int)Auras.BloodPlague) && x.CasterGUID == ObjectManager.LocalPlayer.GUID).Any() 
+		&& ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Blood) >= 1
+		&& ME.GetReadyRuneCountByType(WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Frost) >= 1)
                 {
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FesteringStrike);
                     return;

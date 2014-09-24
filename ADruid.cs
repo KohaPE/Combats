@@ -407,7 +407,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 				return;
 			}
 	
-		if (MyRage < CCSettings.Enrage && AI.Controllers.Spell.CanCast((int)Spells.Enrage) && !ME.HasAuraById((int)Auras.CatForm))
+		if (MyRage < CCSettings.Enrage && AI.Controllers.Spell.CanCast((int)Spells.Enrage) && !ME.HasAuraById((int)Auras.CatForm) && ME.HasAuraById((int)Auras.BearForm))
 			{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Enrage);
 				return;
