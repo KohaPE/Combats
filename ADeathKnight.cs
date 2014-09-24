@@ -516,7 +516,7 @@ namespace Anthrax
 
         }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////FROST SPEC//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////FROST DW SPEC//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		if (ME.HasAuraById((int)Auras.FrostCheck) && !TARGET.HasAuraById((int)Auras.DWCheck))
 		{
@@ -575,7 +575,7 @@ namespace Anthrax
 				}
 			}
 			
-			                // Frost Strike
+			    // Frost Strike
                 if (ME.GetPowerPercent(WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 89 &&
                     AI.Controllers.Spell.CanCast((int)Spells.FrostStrike))
                 {
@@ -709,9 +709,7 @@ namespace Anthrax
 				}
 			
 			//Howling Blast on Cooldown
-			if (AI.Controllers.Spell.CanCast((int)Spells.HowlingBlast) && ME.GetReadyRuneCountByType (WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Frost) > 1 
-			|| AI.Controllers.Spell.CanCast((int)Spells.HowlingBlast) && ME.GetReadyRuneCountByType (WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Death) > 1
-			|| ME.HasAuraById((int)Auras.Rime))
+			if (AI.Controllers.Spell.CanCast((int)Spells.HowlingBlast))
 				{
 					WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HowlingBlast);
 					return;
@@ -724,7 +722,8 @@ namespace Anthrax
 				}
 			//Blood Plague Check
 			if (AI.Controllers.Spell.CanCast((int)Spells.PlagueStrike) && !TARGET.HasAuraById((int)Auras.BloodPlague)
-			|| TARGET.HasAuraById((int)Auras.BloodPlague) && TARGET.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft <= 5000).Any() )
+			|| TARGET.HasAuraById((int)Auras.BloodPlague) && TARGET.Auras.Where(x => x.SpellId == (int)Auras.BloodPlague && x.TimeLeft <= 5000).Any() 
+			|| ME.GetReadyRuneCountByType (WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) >= 1)
 				{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PlagueStrike);
 				return;
@@ -736,12 +735,7 @@ namespace Anthrax
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HowlingBlast);
 				return;
 				}
-			//Obliterate if you have 1 Unholy Rune
-			if (AI.Controllers.Spell.CanCast((int)Spells.Obliterate) && ME.GetReadyRuneCountByType (WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) >= 1)
-				{
-				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Obliterate);
-				return;
-				}
+
 			//Howling Blast
 			if (AI.Controllers.Spell.CanCast((int)Spells.HowlingBlast))
 				{
