@@ -93,7 +93,7 @@ namespace Anthrax
 			RM = 119611,
 			MM = 139597,
 			GlyphofMT = 123763,
-			SynapseS = 96228,
+			SSprings = 96228,
 }
 #endregion
 
@@ -114,6 +114,9 @@ public override void OnPull(WoW.Classes.ObjectManager.WowUnit unit)
 //public override void OnCombat(WoW.Classes.ObjectManager.WowUnit unit)
 //{
 //}
+
+private int lastSSTick = 0;
+
 private void castNextSpellbySinglePriority(WowUnit TARGET)
 {
 
@@ -125,6 +128,15 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		
 	if (TARGET.Health >= 1 && ME.InCombat)
 	{
+	
+				//Engineering Gloves
+			if (!ME.HasAuraById((int)Auras.SSprings) && Environment.TickCount - lastSSTick > 20000 )
+		{
+              Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
+			  Logger.WriteLine("Synapse Srpings Used!!!");
+			  lastSSTick = Environment.TickCount;
+              return;
+          }
 	
 	
 	////////////////////////////////////////////////////Brewmaster///////////////////////////////////

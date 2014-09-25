@@ -159,7 +159,10 @@ namespace Anthrax
 			ReOrign = 139120,
 			WA = 113746,
 			
-					//5.3 Raids
+		//Gloves Snapsys Springs
+		SSprings = 96228,
+			
+		//5.3 Raids
 		FengTheAccursed = 131792,
 		BladeLord = 123474,
 		GrandEmpress = 123707,
@@ -216,6 +219,7 @@ public override void OnPull(WoW.Classes.ObjectManager.WowUnit unit)
 
 private int lastStealthTick = 0;
 private int lastSDTick = 0;
+private int lastSSTick = 0;
 
 private void castNextSpellbySinglePriority(WowUnit TARGET)
 {
@@ -287,6 +291,15 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HealingTouch);
                     return;
             }
+			
+	//Engineering Gloves
+			if (!ME.HasAuraById((int)Auras.SSprings) && Environment.TickCount - lastSSTick > 20000 )
+		{
+              Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
+			  Logger.WriteLine("Synapse Srpings Used!!!");
+			  lastSSTick = Environment.TickCount;
+              return;
+          }
 			
 	if (TARGET.Auras.Where(x => x.SpellId == (int)Auras.Rip && x.TimeLeft > 6000).Any() && AI.Controllers.Spell.CanCast((int)Spells.FeroBite) && ME.ComboPoints > 4
 	|| TARGET.HealthPercent < 25 && ME.ComboPoints > 4 && TARGET.HasAuraById((int)Auras.Rip) && AI.Controllers.Spell.CanCast((int)Spells.FeroBite))
@@ -406,6 +419,15 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.HealingTouch);
 				return;
 			}
+			
+		//Engineering Gloves
+			if (!ME.HasAuraById((int)Auras.SSprings) && Environment.TickCount - lastSSTick > 20000 )
+		{
+              Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
+			  Logger.WriteLine("Synapse Srpings Used!!!");
+			  lastSSTick = Environment.TickCount;
+              return;
+          }
 	
 		if (MyRage < CCSettings.Enrage && AI.Controllers.Spell.CanCast((int)Spells.Enrage) && !ME.HasAuraById((int)Auras.CatForm) && ME.HasAuraById((int)Auras.BearForm))
 			{
@@ -495,6 +517,14 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 						WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Innervate);
 						return;
 					}
+								//Engineering Gloves
+			if (!ME.HasAuraById((int)Auras.SSprings) && Environment.TickCount - lastSSTick > 20000 )
+		{
+              Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
+			  Logger.WriteLine("Synapse Srpings Used!!!");
+			  lastSSTick = Environment.TickCount;
+              return;
+          }
 					
 				if (ME.HasAuraById((int)Auras.ShootingStars) && AI.Controllers.Spell.CanCast((int)Spells.Starsurge))
 				{
@@ -684,6 +714,15 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.NaturesVigil);
                     return;
 			}
+			
+		//Engineering Gloves
+			if (!ME.HasAuraById((int)Auras.SSprings) && Environment.TickCount - lastSSTick > 20000 )
+		{
+              Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
+			  Logger.WriteLine("Synapse Srpings Used!!!");
+			  lastSSTick = Environment.TickCount;
+              return;
+          }
 			
  //Keep Rip From Falling Off
  //if rip timeleft Less then 3 secs and target's health is below 25%
@@ -886,6 +925,16 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		
 	if (TARGET.Health >= 1 && ME.InCombat)
 	{
+	
+					//Engineering Gloves
+			if (!ME.HasAuraById((int)Auras.SSprings) && Environment.TickCount - lastSSTick > 20000 )
+		{
+              Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
+			  Logger.WriteLine("Synapse Srpings Used!!!");
+			  lastSSTick = Environment.TickCount;
+              return;
+          }
+	
 	if (ME.HasAuraById((int)Auras.TankCheck))
 	{
 	//Healing & Survival

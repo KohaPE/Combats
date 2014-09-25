@@ -129,6 +129,9 @@ namespace Anthrax
 		UnholyF = 49016,
 		Str1 = 138702,
 		Str2 = 148899,
+		
+		//Gloves Snapsys Springs
+		SSprings = 96228,
         }
         #endregion
 
@@ -153,6 +156,7 @@ namespace Anthrax
 		private int lastConversionTick = 0;
 		private int lastBTTick = 0;
 		private int lastRuneTapTick = 0;
+		private int lastSSTick = 0;
 		
         private void castNextSpellbySinglePriority(WowUnit TARGET)
 		{
@@ -196,6 +200,15 @@ namespace Anthrax
 		//Rotation
 		if (TARGET.Health >= 1 && ME.InCombat)
 		{
+		
+		//Engineering Gloves
+			if (!ME.HasAuraById((int)Auras.SSprings) && Environment.TickCount - lastSSTick > 20000 )
+		{
+              Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
+			  Logger.WriteLine("Synapse Srpings Used!!!");
+			  lastSSTick = Environment.TickCount;
+              return;
+          }
         if (ME.HasAuraById((int)Auras.UnholyCheck))
 		{
 		
@@ -345,11 +358,9 @@ namespace Anthrax
                     return;
                 }		
 		
-		}//end Combat
+		//end Combat
 		}//end spec check
 		////////////////////////////////////////////////////////////////////////////////////Blood Spec//////////////////////////////////////////////////////////////////////////////////////
-		if (TARGET.Health >= 1 && ME.InCombat)
-		{
         if (ME.HasAuraById((int)Auras.BloodCheck))
 		{
 		//Conversion
@@ -703,10 +714,22 @@ namespace Anthrax
 				return;
 				}
 			//Pillar Of Frost
-				if (!ME.HasAuraById((int)Auras.PoF) && AI.Controllers.Spell.CanCast((int)Spells.PoF))
+				if (!ME.HasAuraById((int)Auras.PoF) && AI.Controllers.Spell.CanCast((int)Spells.PoF) 
+				&& ME.GetReadyRuneCountByType (WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Unholy) >= 1
+				|| !ME.HasAuraById((int)Auras.PoF) && AI.Controllers.Spell.CanCast((int)Spells.PoF) 
+				&& ME.GetPower(Anthrax.WoW.Classes.ObjectManager.WowUnit.WowPowerType.RunicPower) >= 20)
 				{
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.PoF);
 				}
+
+				//Engineering Gloves
+			if (!ME.HasAuraById((int)Auras.SSprings) && Environment.TickCount - lastSSTick > 20000 )
+		{
+              Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
+			  Logger.WriteLine("Synapse Srpings Used!!!");
+			  lastSSTick = Environment.TickCount;
+              return;
+          }
 			
 			//Howling Blast on Cooldown
 			if (AI.Controllers.Spell.CanCast((int)Spells.HowlingBlast))
