@@ -316,7 +316,7 @@ if (ME.HasAuraById((int)Auras.BMCheck))
                 return;
             }
 		//KillCommand
-		if(AI.Controllers.Spell.CanCast((int)Spells.KillCommand)&& Pet.Position.Distance3DFromPlayer < 25)
+		if(AI.Controllers.Spell.CanCast((int)Spells.KillCommand)&& TARGET.Position.Distance3DFromPlayer < 39)
 		    {
                 WoW.Internals.ActionBar.ExecuteSpell((int)Spells.KillCommand);
                 return;
