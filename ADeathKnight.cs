@@ -839,7 +839,14 @@ namespace Anthrax
                     return;
 
                 }
-				
+							//Engineering Gloves
+			if (!ME.HasAuraById((int)Auras.SSprings) && Environment.TickCount - lastSSTick > 20000 )
+		{
+              Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
+			  Logger.WriteLine("Synapse Srpings Used!!!");
+			  lastSSTick = Environment.TickCount;
+              return;
+          }	
 				
 		/////////////////////////////////////////////////////////////////////////////////////Unholy////////////////////////////////////////////////////////////////////////////////////////
 		

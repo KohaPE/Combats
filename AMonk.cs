@@ -363,6 +363,14 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 		
 	if (TARGET.Health >= 1 && ME.InCombat)
 	{
+					//Engineering Gloves
+			if (!ME.HasAuraById((int)Auras.SSprings) && Environment.TickCount - lastSSTick > 20000 )
+		{
+              Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
+			  Logger.WriteLine("Synapse Srpings Used!!!");
+			  lastSSTick = Environment.TickCount;
+              return;
+          }
 	if (ME.HasAuraById((int)Auras.TankCheck))
 	{
 	//Healing & Survival
