@@ -67,6 +67,8 @@ namespace Anthrax
 			Renew = 115151,
 			Uplift = 116670,
 			SurgingMist = 123273,
+			JadeStatue = 115313,
+			OxStatue = 115315,
         }
 
         internal enum Auras : int                       //This is another convenient list of Auras used in our combat routine
@@ -137,6 +139,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 			  lastSSTick = Environment.TickCount;
               return;
           }
+		  
 	
 	
 	////////////////////////////////////////////////////Brewmaster///////////////////////////////////
@@ -145,7 +148,21 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	{
 	//Healing & Survival
 	
-	
+				if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.OxStatue))
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.OxStatue);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
 	
 	if (ME.HealthPercent <= 95 && MyChi >= 3 && AI.Controllers.Spell.CanCast((int)Spells.Guard) && ME.HasAuraById((int)Auras.PG) && !ME.HasAuraById((int)Auras.Guard))
             {
@@ -255,6 +272,23 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	{
 	if (!IsCasting)
 	{
+	
+			if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.JadeStatue))
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.JadeStatue);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
+				
 	//Chi Capping Code
 		if (MyChi >= 4 && AI.Controllers.Spell.CanCast((int)Spells.BOK) && ME.HasAuraById((int)Auras.MM))
 			{
@@ -371,9 +405,26 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 			  lastSSTick = Environment.TickCount;
               return;
           }
+		  
+		
 	if (ME.HasAuraById((int)Auras.TankCheck))
 	{
 	//Healing & Survival
+					if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.OxStatue))
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.OxStatue);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
 	
 	
 	if (ME.HealthPercent <= 95 && MyChi >= 3 && AI.Controllers.Spell.CanCast((int)Spells.Guard) && ME.HasAuraById((int)Auras.PG) && !ME.HasAuraById((int)Auras.Guard))
@@ -502,6 +553,22 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	{
 	if (!IsCasting)
 	{
+	
+				if (DetectKeyPress.GetKeyState(DetectKeyPress.Alt) < 0)
+                {
+                    if (AI.Controllers.Spell.CanCast((int)Spells.JadeStatue))
+                    {
+                        WoW.Internals.MouseController.RightClick();
+                        WoW.Internals.ActionBar.ExecuteSpell((int)Spells.JadeStatue);
+                        WoW.Internals.MouseController.LockCursor();
+                        WoW.Internals.MouseController.MoveMouse(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
+                        WoW.Internals.MouseController.LeftClick();
+                        WoW.Internals.MouseController.UnlockCursor();
+                    }
+
+                    return;
+
+                }
 	//Chi Capping Code
 		if (MyChi >= 4 && AI.Controllers.Spell.CanCast((int)Spells.BOK) && ME.HasAuraById((int)Auras.MM))
 			{
@@ -599,7 +666,20 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
         }
         #endregion
 		
-		
+		public class DetectKeyPress
+    {
+        public static int Shift = 0x10;
+        public static int Ctrl = 0x11;
+        public static int Alt = 0x12;
+
+        public static int Z = 0x5A;
+        public static int X = 0x58;
+        public static int C = 0x43;
+ 
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        internal static extern short GetKeyState(int virtualKeyCode);
+
+    }
 		
 		
 		

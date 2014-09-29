@@ -713,6 +713,13 @@ namespace Anthrax
 				WoW.Internals.ActionBar.ExecuteSpell((int)Spells.FrostStrike);
 				return;
 				}
+				
+				if (!TARGET.HasAuraById((int)Auras.FrostFever) && AI.Controllers.Spell.CanCast((int)Spells.Outbreak) || !TARGET.HasAuraById((int)Auras.BloodPlague) && AI.Controllers.Spell.CanCast((int)Spells.Outbreak))
+				{
+                    WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Outbreak);
+                return;
+				}
+				
 			//Pillar Of Frost
 				if (!ME.HasAuraById((int)Auras.PoF) && AI.Controllers.Spell.CanCast((int)Spells.PoF) 
 				&& ME.GetReadyRuneCountByType (WoW.Classes.ObjectManager.WowLocalPlayer.WowRuneType.Frost) >= 1

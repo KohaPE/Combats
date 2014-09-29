@@ -234,7 +234,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 			return;
         }
 		
-	if (ME.HasAuraById((int)Auras.GlyphofS) && TARGET.Position.Distance3DFromPlayer < 20 && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && !ME.HasAuraById((int)Auras.SavageRoar)
+	if (ME.HasAuraById((int)Auras.GlyphofS) && TARGET.Position.Distance3DFromPlayer < 15 && AI.Controllers.Spell.CanCast((int)Spells.SavageRoar) && !ME.HasAuraById((int)Auras.SavageRoar)
 	&& ME.HasAuraById((int)Auras.CatForm))
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.SavageRoar);
@@ -265,13 +265,13 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	{
 	if (ME.HasAuraById((int)Auras.Prowl))
 	{
-	if (AI.Controllers.Spell.CanCast((int)Spells.Pounce) && Anthrax.WoW.Internals.Movements.IsFacingHeading(ObjectManager.Target.Position))
+	if (AI.Controllers.Spell.CanCast((int)Spells.Pounce) && Anthrax.WoW.Internals.Movements.IsFacingHeading(ObjectManager.Target.Position) && TARGET.Position.Distance3DFromPlayer < 8)
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Pounce);
                     return;
 			}	
 	else
-	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage))
+	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage) && TARGET.Position.Distance3DFromPlayer < 8)
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Ravage);
                     return;
@@ -687,7 +687,8 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	{
 
 
-	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage) && WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target))
+	if (AI.Controllers.Spell.CanCast((int)Spells.Ravage) && WoW.Internals.ObjectManager.LocalPlayer.IsBehindUnit(WoW.Internals.ObjectManager.Target) 
+	&& TARGET.Position.Distance3DFromPlayer < 8)
 			{
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.Ravage);
                     return;
@@ -714,15 +715,7 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
                     WoW.Internals.ActionBar.ExecuteSpell((int)Spells.NaturesVigil);
                     return;
 			}
-			
-		//Engineering Gloves
-			if (!ME.HasAuraById((int)Auras.SSprings) && Environment.TickCount - lastSSTick > 20000 )
-		{
-              Anthrax.WoW.Internals.ActionBar.PressSlot(0, 0);
-			  Logger.WriteLine("Synapse Srpings Used!!!");
-			  lastSSTick = Environment.TickCount;
-              return;
-          }
+		
 			
  //Keep Rip From Falling Off
  //if rip timeleft Less then 3 secs and target's health is below 25%
@@ -835,6 +828,10 @@ private void castNextSpellbySinglePriority(WowUnit TARGET)
 	{
 	if (!ME.IsCasting)
 	{
+
+	
+	
+	
 	//Lifebloom Code
 	if (TARGET.HealthPercent <= CCSettings.Lifebloom && TARGET.Auras.Where(x => x.SpellId == (int)Auras.Lifebloom && x.StackCount < 3).Any() && AI.Controllers.Spell.CanCast((int)Spells.Lifebloom)
 	|| TARGET.HealthPercent <= CCSettings.Lifebloom && !TARGET.HasAuraById((int)Auras.Lifebloom) && AI.Controllers.Spell.CanCast((int)Spells.Lifebloom)
